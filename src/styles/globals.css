@@ -1,15 +1,8 @@
 .logo {
     transform: scale(0.95) rotate(-5deg);
-    will-change: filter;
+    filter: hue-rotate(70deg);
+    will-change: filter, transform;
     transition: filter 300ms;
-}
-
-.logo:hover {
-    transform: scale(1) rotate(0deg);
-}
-
-.logo {
-  transition: filter 0.5s ease-out;
 }
 
 .logo:hover {
@@ -21,13 +14,16 @@
 @keyframes logo-hue-rotate {
   0% {
     transform: scale(0.95) rotate(-5deg);
-    filter: hue-rotate(0deg) drop-shadow(0 0 1em #008cff);
+    filter: hue-rotate(70deg) drop-shadow(0 0 1em #008cff);
   }
   20% {
     filter: hue-rotate(90deg) drop-shadow(0 0 1em #008cff); 
   }
+  40% {
+    filter: hue-rotate(0deg) drop-shadow(0 0 1em #008cff); 
+  }
   100% {
-    filter: hue-rotate(360deg) drop-shadow(0 0 1em #008cff); 
+    filter: hue-rotate(70deg) drop-shadow(0 0 1em #008cff); 
     transform: scale(1) rotate(360deg);
   }
 }
@@ -131,8 +127,6 @@
 .no-motion {
   animation: none !important;
   transition: none !important;
-  scale: 1 !important;
-  rotate: 0deg !important;
   transition-duration: 0.001ms !important;
   transform: none !important;
 }
@@ -141,8 +135,6 @@
   animation: none !important;
   transition: none !important;
   transition-duration: 0.001ms !important;
-  scale: 1 !important;
-  rotate: 0deg !important;
   transform: none !important;
 }
 

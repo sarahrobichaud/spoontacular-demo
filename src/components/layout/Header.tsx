@@ -8,7 +8,7 @@ import { useAnimationPrefs } from "../../contexts/AnimationContext";
 import { useSafeAnimations } from "../../hooks/use-safe-animations";
 export default function Header() {
 
-    const { searchTerm, setSearchTerm, layoutState, performSearch } = useLayout();
+    const { searchTerm, setSearchTerm, layoutState, performSearch , isCentered} = useLayout();
 
     const isMobile = useIsMobile();
 
@@ -24,12 +24,15 @@ export default function Header() {
     return (
         <>
             {isMobile && layoutState !== LayoutState.CENTERED &&
-                <motion.div
-                    className="fixed bottom-0 left-0 right-0 container mx-auto px-4 bg-black/100 py-8 border-t-2 border-gray-300/10"
-                    initial={ prefersReducedMotion ? {} : { opacity: 0, y: 100 }}
-                    animate={ prefersReducedMotion ? {} : { opacity: 1, y: 0 }}
-                    exit={ prefersReducedMotion ? {} : { opacity: 0, y: 100 }}
-                    transition={ prefersReducedMotion ? { duration: 0 } : { duration: 0.3 }}
+                <div
+                    className="fixed bottom-0 left-0 right-0 container mx-auto px-4 bg-black/100 py-4 border-t-2 border-gray-300/10 min-h-[100px]"
+                    style={!prefersReducedMotion ? {
+                        opacity: isCentered ? 0 : 1,
+                        transform: `translateY(${isCentered ? '100px' : '0'})`,
+                        transition: 'opacity 0.3s ease-in-out, transform 0.3s ease-in-out'
+                    } : {
+                        opacity: 1
+                    }}
                 >
                     <div className="w-full flex justify-between items-center">
                         <input
@@ -50,7 +53,7 @@ export default function Header() {
                             </svg>
                         </button>
                     </div>
-                </motion.div>
+                </div>
             }
 
             <header className="py-4 bg-blur-lg backdrop-blur-sm bg-black/50 border-b-2 border-gray-300/10">
