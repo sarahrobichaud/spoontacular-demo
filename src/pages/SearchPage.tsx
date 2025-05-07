@@ -6,6 +6,7 @@ import RecipeIdeasPrompt from "../components/RecipeIdeaPrompt";
 import { CustomLoader } from "../components/ui/CustomLoader";
 import { RecipeCard } from "../components/RecipeCard";
 import { useAnimationPrefs } from "../contexts/AnimationContext";
+import { useSearch } from "../contexts/SearchContext";
 
 const mockImg = "https://placehold.co/200x150"
 
@@ -28,7 +29,7 @@ const mockRecipes: Recipe[] = [
 
 export function SearchSection() {
 
-    const { searchTerm, setSearchTerm, performSearch } = useLayout();
+    const { searchTerm, setSearchTerm, performSearch } = useSearch();
     const { prefersReducedMotion } = useAnimationPrefs();
 
     const handleSearch = (e: FormEvent<HTMLFormElement>) => {
@@ -76,7 +77,9 @@ export function SearchSection() {
 }
 
 export default function SearchPage() {
-    const { searchTerm, setSearchTerm, isCentered, isLoading } = useLayout();
+    const { isCentered} = useLayout();
+    const { searchTerm, setSearchTerm, isLoading } = useSearch();
+
     const location = useLocation();
     const { prefersReducedMotion } = useAnimationPrefs();
 

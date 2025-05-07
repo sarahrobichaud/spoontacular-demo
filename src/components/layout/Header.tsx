@@ -6,9 +6,12 @@ import { Link } from "react-router";
 import type { FormEvent } from "react";
 import { useAnimationPrefs } from "../../contexts/AnimationContext";
 import { useSafeAnimations } from "../../hooks/use-safe-animations";
+import { useSearch } from "../../contexts/SearchContext";
 export default function Header() {
 
-    const { searchTerm, setSearchTerm, layoutState, performSearch , isCentered} = useLayout();
+    const { searchTerm, setSearchTerm, performSearch } = useSearch();
+    const { layoutState , isCentered} = useLayout();
+
 
     const isMobile = useIsMobile();
 
