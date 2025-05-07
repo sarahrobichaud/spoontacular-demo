@@ -1,15 +1,20 @@
-import { AnimatePresence, motion } from "framer-motion"
+import { AnimatePresence, motion} from "framer-motion"
 import { useLayout } from "../../contexts/LayoutContext";
 import { LayoutState } from "../../contexts/LayoutContext";
 import { useIsMobile } from "../../hooks/use-mobile";
 import { Link } from "react-router";
-import type { ChangeEvent, FormEvent } from "react";
-
+import type { FormEvent } from "react";
+import { useAnimationPrefs } from "../../contexts/AnimationContext";
+import { useSafeAnimations } from "../../hooks/use-safe-animations";
 export default function Header() {
 
     const { searchTerm, setSearchTerm, layoutState, performSearch } = useLayout();
 
     const isMobile = useIsMobile();
+
+    const { prefersReducedMotion, toggleReducedMotion } = useAnimationPrefs();
+
+    const { getNoMotionOverride } = useSafeAnimations();
 
     const handleSearch = (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -21,10 +26,10 @@ export default function Header() {
             {isMobile && layoutState !== LayoutState.CENTERED &&
                 <motion.div
                     className="fixed bottom-0 left-0 right-0 container mx-auto px-4 bg-black/100 py-8 border-t-2 border-gray-300/10"
-                    initial={{ opacity: 0, y: 100 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: 100 }}
-                    transition={{ duration: 0.3 }}
+                    initial={ prefersReducedMotion ? {} : { opacity: 0, y: 100 }}
+                    animate={ prefersReducedMotion ? {} : { opacity: 1, y: 0 }}
+                    exit={ prefersReducedMotion ? {} : { opacity: 0, y: 100 }}
+                    transition={ prefersReducedMotion ? { duration: 0 } : { duration: 0.3 }}
                 >
                     <div className="w-full flex justify-between items-center">
                         <input
@@ -51,7 +56,7 @@ export default function Header() {
             <header className="py-4 bg-blur-lg backdrop-blur-sm bg-black/50 border-b-2 border-gray-300/10">
                 <div className="container mx-auto px-4 flex justify-between items-center">
                     <Link to="/" className="flex items-center gap-2">
-                        <img src="/logo.svg" alt="RecipeFinder Logo" className="w-10 h-10 logo" />
+                        <img src="/logo.svg" alt="RecipeFinder Logo" className={`w-10 h-10 logo ${getNoMotionOverride()}`} />
                         <span className="text-2xl font-bold">RecipeFinder</span>
                     </Link>
                     {!isMobile &&
@@ -60,10 +65,10 @@ export default function Header() {
                                 <motion.form
                                     className="flex-1 max-w-lg mx-4"
                                     onSubmit={handleSearch}
-                                    initial={{ opacity: 0, y: -10 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    exit={{ opacity: 0 }}
-                                    transition={{ duration: 0.3 }}
+                                    initial={ prefersReducedMotion ? {} : { opacity: 0, y: -10 }}
+                                    animate={ prefersReducedMotion ? {} : { opacity: 1, y: 0 }}
+                                    exit={ prefersReducedMotion ? {} : { opacity: 0 }}
+                                    transition={ prefersReducedMotion ? { duration: 0 } : { duration: 0.3 }}
                                 >
                                     <div className="relative interactable">
                                         <input
@@ -91,8 +96,12 @@ export default function Header() {
                     <nav >
                         <ul className="flex items-center gap-4">
                             <li>
-                                <button className="text-white hover:text-blue-300 interactable">
-                                    Reduce Motion
+                                  <button 
+                                    className={`text-white hover:text-blue-300 interactable ${prefersReducedMotion ? 'text-blue-300' : ''}`}
+                                    onClick={toggleReducedMotion}
+                                    aria-pressed={prefersReducedMotion}
+                                >
+                                    {prefersReducedMotion ? 'Enable Motion' : 'Reduce Motion'}
                                 </button>
                             </li>
                         </ul>

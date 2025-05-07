@@ -3,10 +3,36 @@
     will-change: filter;
     transition: filter 300ms;
 }
+
 .logo:hover {
     transform: scale(1) rotate(0deg);
-  filter: drop-shadow(0 0 1em #058505);
 }
+
+.logo {
+  transition: filter 0.5s ease-out;
+}
+
+.logo:hover {
+  animation: logo-hue-rotate 1s ease-in-out;
+  animation-fill-mode: forwards;
+  animation-timing-function: cubic-bezier(0.25, 0.1, 0.25, 1.4);
+}
+
+@keyframes logo-hue-rotate {
+  0% {
+    transform: scale(0.95) rotate(-5deg);
+    filter: hue-rotate(0deg) drop-shadow(0 0 1em #008cff);
+  }
+  20% {
+    filter: hue-rotate(90deg) drop-shadow(0 0 1em #008cff); 
+  }
+  100% {
+    filter: hue-rotate(360deg) drop-shadow(0 0 1em #008cff); 
+    transform: scale(1) rotate(360deg);
+  }
+}
+
+
 
 .interactable {
     will-change: filter;
@@ -100,6 +126,39 @@
   opacity: 0.7;
   z-index: -1;
   filter: blur(4px);
+}
+
+.no-motion {
+  animation: none !important;
+  transition: none !important;
+  scale: 1 !important;
+  rotate: 0deg !important;
+  transition-duration: 0.001ms !important;
+  transform: none !important;
+}
+
+.no-motion:hover , .no-motion:focus , .no-motion:focus-within {
+  animation: none !important;
+  transition: none !important;
+  transition-duration: 0.001ms !important;
+  scale: 1 !important;
+  rotate: 0deg !important;
+  transform: none !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after , .no-motion {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    animation: none !important;
+    transition: none !important;
+    transition-duration: 0.001ms !important;
+  }
+
+  .gradient-overlay::before {
+    animation: none !important;
+    background-position: center !important;
+  }
 }
 
 

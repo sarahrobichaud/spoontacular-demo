@@ -5,7 +5,7 @@ import { useLayout } from "../contexts/LayoutContext";
 import RecipeIdeasPrompt from "../components/RecipeIdeaPrompt";
 import { CustomLoader } from "../components/ui/CustomLoader";
 import { RecipeCard } from "../components/RecipeCard";
-import { useParallax } from "../hooks/use-parallax";
+import { useAnimationPrefs } from "../contexts/AnimationContext";
 
 const mockImg = "https://placehold.co/200x150"
 
@@ -29,6 +29,7 @@ const mockRecipes: Recipe[] = [
 export function SearchSection() {
 
     const { searchTerm, setSearchTerm, performSearch } = useLayout();
+    const { prefersReducedMotion } = useAnimationPrefs();
 
     const handleSearch = (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -39,10 +40,10 @@ export function SearchSection() {
         <motion.div
             key="centered"
             className="flex flex-col items-center justify-center min-h-[70vh]"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -100 }}
-            transition={{ duration: 0.3 }}
+            initial={ prefersReducedMotion ? {} : { opacity: 0 }}
+            animate={ prefersReducedMotion ? {} : { opacity: 1, y: 0 }}
+            exit={ prefersReducedMotion ? {} : { opacity: 0, y: -100 }}
+            transition={ prefersReducedMotion ? { duration: 0 } : { duration: 0.3 }}
         >
             <div className="text-center mb-8">
                 <h1 className="text-5xl font-bold mb-2">RecipeFinder</h1>
@@ -77,6 +78,7 @@ export function SearchSection() {
 export default function SearchPage() {
     const { searchTerm, setSearchTerm, isCentered, isLoading } = useLayout();
     const location = useLocation();
+    const { prefersReducedMotion } = useAnimationPrefs();
 
     useEffect(() => {
         const params = new URLSearchParams(location.search);
@@ -111,10 +113,10 @@ export default function SearchPage() {
                         <motion.div
                             key="results"
                             className="w-full"
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            exit={{ opacity: 0 }}
-                            transition={{ duration: 0.2 }}
+                            initial={ prefersReducedMotion ? {} : { opacity: 0, y: 20 }}
+                            animate={ prefersReducedMotion ? {} : { opacity: 1, y: 0 }}
+                            exit={ prefersReducedMotion ? {} : { opacity: 0 }}
+                            transition={ prefersReducedMotion ? { duration: 0 } : { duration: 0.2 }}
                         >
                             {filteredRecipes.length > 0 ? (
                                 <div>

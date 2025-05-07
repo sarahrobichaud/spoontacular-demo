@@ -1,10 +1,12 @@
 import type { ReactNode } from "react"
 import { LayoutProvider } from "./LayoutContext"
-
+import { AnimationProvider } from "./AnimationContext"
 export function AppProvider({ children }: { children: ReactNode }) {
     return (
-        <LayoutProvider>
-            {children}
-        </LayoutProvider>
+        <AnimationProvider>
+            <LayoutProvider>
+                {children}
+            </LayoutProvider>
+        </AnimationProvider>
     )
 }

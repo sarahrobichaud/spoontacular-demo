@@ -2,6 +2,7 @@ import { useParams, Link } from "react-router";
 import { motion } from "framer-motion";
 import { useEffect } from "react";
 import { useLayout } from "../contexts/LayoutContext";
+import { useAnimationPrefs } from "../contexts/AnimationContext";
 
 const mockRecipes = [
   { 
@@ -22,7 +23,9 @@ const mockRecipes = [
 export default function RecipeDetails() {
   const { id } = useParams();
   const { layoutState, setLayoutState } = useLayout();
+  const { prefersReducedMotion } = useAnimationPrefs();
   
+
   useEffect(() => {
     if (layoutState === 'centered') {
       setLayoutState('header');
@@ -42,10 +45,10 @@ export default function RecipeDetails() {
   
   return (
     <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      transition={{ duration: 0.3 }}
+      initial={ prefersReducedMotion ? {} : { opacity: 0 }}
+      animate={ prefersReducedMotion ? {} : { opacity: 1 }}
+      exit={ prefersReducedMotion ? {} : { opacity: 0 }}
+      transition={ prefersReducedMotion ? { duration: 0 } : { duration: 0.3 }}
       className=""
     >
       <Link to="/" className="text-blue-500 hover:underline inline-flex items-center mb-6">

@@ -1,21 +1,21 @@
 import { motion} from "framer-motion";
 import { useAnimatedRecipeIdea } from "../hooks/use-animated-recipe-idea";
-
+import { useAnimationPrefs } from "../contexts/AnimationContext";
 import { AnimatePresence } from "framer-motion";
 import { useIsMobile } from "../hooks/use-mobile";
 
 export default function RecipeIdeasPrompt() {
   const { recipeIdea, color } = useAnimatedRecipeIdea();
   const isMobile = useIsMobile();
-  
+  const { prefersReducedMotion } = useAnimationPrefs();
 
   return (
     <motion.div
       className="py-12 text-center"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      transition={{ duration: 0.3 }}
+      initial={ prefersReducedMotion ? {} : { opacity: 0 }}
+      animate={ prefersReducedMotion ? {} : { opacity: 1 }}
+      exit={ prefersReducedMotion ? {} : { opacity: 0 }}
+      transition={ prefersReducedMotion ? { duration: 0 } : { duration: 0.3 }}
     >
       <div className="max-w-xl mx-auto px-4">
         <h2 className="text-2xl font-semibold mb-6">Looking for recipe ideas?</h2>
@@ -23,12 +23,12 @@ export default function RecipeIdeasPrompt() {
           <AnimatePresence mode="wait">
             <motion.span
               key={recipeIdea}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
+              initial={ prefersReducedMotion ? {} : { opacity: 0, y: 10 }}
+              animate={ prefersReducedMotion ? {} : { opacity: 1, y: 0 }}
+              exit={ prefersReducedMotion ? {} : { opacity: 0, y: -10 }}
               style={{ color, display: "inline-block", filter: `drop-shadow(0 0 4em ${color})`}}
               className="font-bold mx-1"
-              transition={{ duration: 0.2, ease: "easeInOut" }}
+              transition={ prefersReducedMotion ? { duration: 0 } : { duration: 0.2, ease: "easeInOut" }}
             >
               {recipeIdea}
             </motion.span>

@@ -19,11 +19,13 @@ interface LayoutContextType {
   setLayoutState: (state: LayoutState) => void;
   performSearch: (term: string) => void;
   isCentered: boolean;
+  initialShiftHappened: boolean;
 }
 
 const LayoutContext = createContext<LayoutContextType | undefined>(undefined);
 
 export function LayoutProvider({ children }: { children: ReactNode }) {
+    const [initialShiftHappened, setInitialShiftHappened] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [layoutState, setLayoutState] = useState<LayoutState>(LayoutState.CENTERED);
   const navigate = useNavigate();
@@ -37,8 +39,7 @@ export function LayoutProvider({ children }: { children: ReactNode }) {
     }
   }, [debouncedSearchTerm]);
 
-
-  useEffect(() => {
+  const evaluateLayoutState = () => {
     const params = new URLSearchParams(location.search);
     const q = params.get('q');
 
@@ -50,7 +51,16 @@ export function LayoutProvider({ children }: { children: ReactNode }) {
     } else {
       setLayoutState(LayoutState.HEADER);
     }
+    setInitialShiftHappened(true);
+  }
+
+  useEffect(() => {
+    evaluateLayoutState();
   }, [location]);
+
+  useEffect(() => {
+    evaluateLayoutState();
+  }, []);
 
   const performSearch = (term: string) => {
     if (!term.trim()) return;
@@ -61,7 +71,7 @@ export function LayoutProvider({ children }: { children: ReactNode }) {
 
   return (
     <LayoutContext.Provider
-      value={{ searchTerm, setSearchTerm, layoutState, setLayoutState, performSearch, isCentered: layoutState === LayoutState.CENTERED, isLoading }}
+      value={{ searchTerm, setSearchTerm, layoutState, setLayoutState, performSearch, isCentered: layoutState === LayoutState.CENTERED, isLoading , initialShiftHappened }}
     >
       {children}
     </LayoutContext.Provider>
