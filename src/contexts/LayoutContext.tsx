@@ -1,0 +1,66 @@
+import { createContext, useContext, useState, type ReactNode, } from 'react';
+import { useLocation, useNavigate } from 'react-router';
+import { useEffect } from 'react';
+
+export const LayoutState = {
+    CENTERED: 'centered',
+    HEADER: 'header',
+} as const;
+
+export type LayoutState = (typeof LayoutState)[keyof typeof LayoutState];
+
+
+interface LayoutContextType {
+  searchTerm: string;
+  setSearchTerm: (term: string) => void;
+  layoutState: LayoutState;
+  setLayoutState: (state: LayoutState) => void;
+  performSearch: (term: string) => void;
+  isCentered: boolean;
+}
+
+const LayoutContext = createContext<LayoutContextType | undefined>(undefined);
+
+export function LayoutProvider({ children }: { children: ReactNode }) {
+  const [searchTerm, setSearchTerm] = useState('');
+  const [layoutState, setLayoutState] = useState<LayoutState>(LayoutState.CENTERED);
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const q = params.get('q');
+
+    if (q) {
+      setSearchTerm(q);
+      setLayoutState(LayoutState.HEADER);
+    } else if (location.pathname === '/') {
+      setLayoutState(LayoutState.CENTERED);
+    } else {
+      setLayoutState(LayoutState.HEADER);
+    }
+  }, [location]);
+
+  const performSearch = (term: string) => {
+    if (!term.trim()) return;
+    setSearchTerm(term);
+    setLayoutState(LayoutState.HEADER);
+    navigate(`/?q=${encodeURIComponent(term)}`);
+  };
+
+  return (
+    <LayoutContext.Provider
+      value={{ searchTerm, setSearchTerm, layoutState, setLayoutState, performSearch , isCentered: layoutState === LayoutState.CENTERED}}
+    >
+      {children}
+    </LayoutContext.Provider>
+  );
+}
+
+export function useLayout() {
+  const context = useContext(LayoutContext);
+  if (context === undefined) {
+    throw new Error('useLayout must be used within a LayoutProvider');
+  }
+  return context;
+}

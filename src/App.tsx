@@ -1,14 +1,20 @@
 import { createBrowserRouter, Outlet, RouterProvider } from 'react-router'
-import DefaultLayout from './layouts/default'
+import DefaultLayout from './layouts/Default'
 import SearchPage from './pages/SearchPage'
 import RecipeDetails from './pages/RecipeDetails'
 import ErrorPage from './pages/ErrorPage'
 
-import './App.css'
+import './styles/globals.css'
+import './styles/tailwind.css'
+import { AppProvider } from './contexts/AppProvider'
+
+
+const flow = <AppProvider><DefaultLayout><Outlet /></DefaultLayout></AppProvider>;
+
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <DefaultLayout><Outlet /></DefaultLayout>,
+    element: flow,
     errorElement: <ErrorPage />,
     children: [
       {
@@ -27,7 +33,7 @@ const router = createBrowserRouter([
 function App() {
 
   return (
-    <RouterProvider router={router} />
+      <RouterProvider router={router} />
   )
 }
 
