@@ -1,11 +1,23 @@
 import { useEffect, type FormEvent } from "react";
-import { Link, useLocation } from "react-router";
+import { useLocation } from "react-router";
 import { motion, AnimatePresence } from "framer-motion";
 import { useLayout } from "../contexts/LayoutContext";
 import RecipeIdeasPrompt from "../components/RecipeIdeaPrompt";
 import { CustomLoader } from "../components/ui/CustomLoader";
+import { RecipeCard } from "../components/RecipeCard";
+import { useParallax } from "../hooks/use-parallax";
+
 const mockImg = "https://placehold.co/200x150"
-const mockRecipes = [
+
+export interface Recipe {
+    id: number;
+    title: string;
+    image: string;
+    minutes: number;
+    healthScore: number;
+}
+
+const mockRecipes: Recipe[] = [
     { id: 1, title: "Pasta Carbonara", image: mockImg, minutes: 30, healthScore: 45 },
     { id: 2, title: "Chicken Curry", image: mockImg, minutes: 45, healthScore: 70 },
     { id: 3, title: "Vegetable Stir Fry", image: mockImg, minutes: 20, healthScore: 90 },
@@ -109,24 +121,7 @@ export default function SearchPage() {
                                     <h2 className="text-xl font-semibold mb-4">Search Results</h2>
                                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                                         {filteredRecipes.map(recipe => (
-                                            <motion.div
-                                                key={recipe.id}
-                                                className="bg-black/50 border-2 border-gray-300/10 rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow"
-                                                initial={{ opacity: 0 }}
-                                                animate={{ opacity: 1 }}
-                                                transition={{ duration: 0.3, delay: 0.1 }}
-                                            >
-                                                <Link to={`/recipe/${recipe.id}`} className="block">
-                                                    <img src={recipe.image} alt={recipe.title} className="w-full h-48 object-cover" />
-                                                    <div className="p-4">
-                                                        <h3 className="text-lg font-semibold mb-2">{recipe.title}</h3>
-                                                        <div className="flex justify-between text-sm text-gray-600">
-                                                            <span>⏱️ {recipe.minutes} mins</span>
-                                                            <span>❤️ {recipe.healthScore}% Health Score</span>
-                                                        </div>
-                                                    </div>
-                                                </Link>
-                                            </motion.div>
+                                            <RecipeCard key={recipe.id} recipe={recipe} />
                                         ))}
                                     </div>
                                 </div>
