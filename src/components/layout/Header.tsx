@@ -3,7 +3,7 @@ import { useLayout } from "../../contexts/LayoutContext";
 import { LayoutState } from "../../contexts/LayoutContext";
 import { useIsMobile } from "../../hooks/use-mobile";
 import { Link } from "react-router";
-import type { FormEvent } from "react";
+import type { ChangeEvent, FormEvent } from "react";
 
 export default function Header() {
 

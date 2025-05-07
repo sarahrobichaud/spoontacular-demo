@@ -1,6 +1,7 @@
 import { createContext, useContext, useState, type ReactNode, } from 'react';
 import { useLocation, useNavigate } from 'react-router';
 import { useEffect } from 'react';
+import { useDebounce } from '../hooks/use-debounce';
 
 export const LayoutState = {
     CENTERED: 'centered',
@@ -11,6 +12,7 @@ export type LayoutState = (typeof LayoutState)[keyof typeof LayoutState];
 
 
 interface LayoutContextType {
+  isLoading: boolean;
   searchTerm: string;
   setSearchTerm: (term: string) => void;
   layoutState: LayoutState;
@@ -26,6 +28,15 @@ export function LayoutProvider({ children }: { children: ReactNode }) {
   const [layoutState, setLayoutState] = useState<LayoutState>(LayoutState.CENTERED);
   const navigate = useNavigate();
   const location = useLocation();
+
+  const { debouncedValue: debouncedSearchTerm, isLoading } = useDebounce(searchTerm, 500);
+
+  useEffect(() => {
+    if (debouncedSearchTerm && searchTerm === debouncedSearchTerm && layoutState === LayoutState.HEADER) {
+      performSearch(debouncedSearchTerm);
+    }
+  }, [debouncedSearchTerm]);
+
 
   useEffect(() => {
     const params = new URLSearchParams(location.search);
@@ -50,7 +61,7 @@ export function LayoutProvider({ children }: { children: ReactNode }) {
 
   return (
     <LayoutContext.Provider
-      value={{ searchTerm, setSearchTerm, layoutState, setLayoutState, performSearch , isCentered: layoutState === LayoutState.CENTERED}}
+      value={{ searchTerm, setSearchTerm, layoutState, setLayoutState, performSearch, isCentered: layoutState === LayoutState.CENTERED, isLoading }}
     >
       {children}
     </LayoutContext.Provider>
