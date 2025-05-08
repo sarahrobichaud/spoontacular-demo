@@ -13,6 +13,47 @@ export interface Recipe {
   healthScore?: number;
 }
 
+export interface DetailedRecipe extends Recipe {
+  summary: string;
+  instructions: string;
+  analyzedInstructions: {
+    name: string;
+    steps: {
+      number: number;
+      step: string;
+      ingredients: {
+        id: number;
+        name: string;
+        localizedName: string;
+        image: string;
+      }[];
+      equipment: {
+        id: number;
+        name: string;
+        localizedName: string;
+        image: string;
+      }[];
+    }[];
+  }[];
+  extendedIngredients: {
+    id: number;
+    aisle: string;
+    image: string;
+    name: string;
+    amount: number;
+    unit: string;
+    unitShort: string;
+    unitLong: string;
+    originalString: string;
+    metaInformation: string[];
+  }[];
+  diets: string[];
+  vegetarian: boolean;
+  vegan: boolean;
+  glutenFree: boolean;
+  dairyFree: boolean;
+}
+
 export interface RecipeSearchParams {
   query?: string;
   cuisine?: string;
@@ -37,4 +78,8 @@ export interface RecipeSearchResponse {
 
 export async function complexSearch(params: RecipeSearchParams): Promise<RecipeSearchResponse> {
   return fetchSpoonacular<RecipeSearchResponse>('/recipes/complexSearch', params);
+}
+
+export async function getRecipeInformation(id: number): Promise<DetailedRecipe> {
+  return fetchSpoonacular<DetailedRecipe>(`/recipes/${id}/information`, { includeNutrition: true });
 }

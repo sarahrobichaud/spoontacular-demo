@@ -6,10 +6,9 @@ import type { FormEvent } from "react";
 import { useAnimationPrefs } from "../../contexts/AnimationContext";
 import { useSafeAnimations } from "../../hooks/use-safe-animations";
 import { useSearch } from "../../contexts/SearchContext";
-import { Link } from "react-router";
 export default function Header() {
 
-    const { searchTerm, setSearchTerm } = useSearch();
+    const { searchTerm, setSearchTerm, handleSearch } = useSearch();
     const { layoutState , isCentered} = useLayout();
 
 
@@ -22,7 +21,7 @@ export default function Header() {
 
     const search = (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        triggerSearch();
+        handleSearch();
     }
 
     return (

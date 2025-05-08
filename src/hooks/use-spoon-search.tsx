@@ -1,24 +1,16 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, } from 'react';
 import { complexSearch, type RecipeSearchResponse } from '../services/spoonacular';
 import type { Recipe } from '../services/spoonacular';
 import { mockRecipes } from '../data/mockRecipes';
+import { useLocation, useNavigate } from 'react-router';
 
-interface SearchParams {
-  query: string;
-  page: number;
-  pageSize: number;
-  [key: string]: any;
-}
 
-// Function to generate mock search response
 const generateMockResponse = async (query: string, offset: number, number: number): Promise<RecipeSearchResponse> => {
-  // Filter recipes based on query to simulate search
   const filteredRecipes = mockRecipes.filter(recipe => 
     recipe.title.toLowerCase().includes(query.toLowerCase())
   );
 
   
-  // Paginate results
   let paginatedResults: Recipe[] = [];
   if(filteredRecipes.length > 5) {
     paginatedResults = filteredRecipes.slice(offset, offset + number);
@@ -46,6 +38,9 @@ export function useSpoonSearch() {
   const [offset, setOffset] = useState(0);
   const [results, setResults] = useState<Recipe[]>([]);
 
+  const navigate = useNavigate();
+
+  const pathname = useLocation().pathname;
 
   const reset = () => {
     setResults([]);
@@ -59,6 +54,12 @@ export function useSpoonSearch() {
     page = 1, 
     pageSize = 10,
   }: {query: string, page: number, pageSize: number, [key: string]: any}) => {
+
+    if(pathname !== '/') {
+        const searchParams = new URLSearchParams();
+        searchParams.set('q', query);
+        navigate(`/?${searchParams.toString()}`);
+    }
 
     let resetOffset = false;
     if (!query?.trim()) return;
@@ -80,16 +81,15 @@ export function useSpoonSearch() {
         offset = 0;
       }
       
-    //   const data = await complexSearch({ 
-    //     query,
-    //     offset,
-    //     number: pageSize,
-    //   });
+      const data = await complexSearch({ 
+        query,
+        offset,
+        number: pageSize,
+      });
 
 
-      const mockData = await generateMockResponse(query, offset, pageSize);
 
-      const { results, ...newMetadata } = mockData;
+      const { results, ...newMetadata } = data;
       
       setResults(results);
       setTotalResults(newMetadata.totalResults);
