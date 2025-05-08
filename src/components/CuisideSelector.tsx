@@ -12,8 +12,9 @@ export const CuisineSelector = (props: HTMLAttributes<HTMLDivElement>) => {
             <div {...props}>
                 <button
                     type="button"
-                    className={clsx(`glassy-badge interactive`, {
+                    className={clsx(`glassy-badge`, {
                         "active": includeAllCuisines,
+                        "interactive": !includeAllCuisines
                     })}
                     onClick={() => toggleCuisine('all')}
                 >
@@ -23,8 +24,8 @@ export const CuisineSelector = (props: HTMLAttributes<HTMLDivElement>) => {
                     <button
                         key={c}
                         type="button"
-                        className={clsx(`glassy-badge interactive`, {
-                            "active": hasCuisine(c.toLowerCase()) || includeAllCuisines,
+                        className={clsx(`glassy-badge interactive min-h-[44px] min-w-[44px]`, { 
+                            "active": hasCuisine(c.toLowerCase()) && !includeAllCuisines,
                         })}
                         onClick={() => toggleCuisine(c.toLowerCase())}
                     >

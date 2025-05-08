@@ -36,6 +36,10 @@ export default function SearchPage() {
     const isMobile = useIsMobile();
 
 
+    useEffect(() => {
+        console.log(isMobile, isFilterOpen);
+    }, [isMobile, isFilterOpen]);
+
     return (
         <div className="w-full min-h-screen">
             <AnimatePresence mode="wait">
@@ -58,9 +62,8 @@ export default function SearchPage() {
                             </motion.div>}
                     </div>
                     {!isCentered && (
-                        //here
                         <div className="order-1 lg:order-2">
-                            {data.length > 0 && (
+                            {data.length > 0  && query.trim() !== '' && (
                                 <>
                                     <h3 className="mb-4 text-lg  font-semibold">{pagination.totalResults} {pagination.totalResults === 1 ? 'recipe' : 'recipes'} found</h3>
                                     {pagination.available &&
@@ -72,7 +75,9 @@ export default function SearchPage() {
                                 </>
                             )}
 
-                            <div className="flex justify-between gap-2 w-full">
+                            <div className={clsx("flex justify-between gap-2 w-full", {
+                                "my-4 p-2 border-y border-gray-300/10": isMobile,
+                            })}>
                                 <h3 className="my-4 text-lg font-semibold">Filter by cuisine</h3>
                                 {isMobile &&
                                     <button onClick={() => setIsFilterOpen(prev => !prev)} className="button">
@@ -80,7 +85,7 @@ export default function SearchPage() {
                                     </button>
                                 }
                             </div>
-                            {isMobile && isFilterOpen || (!isMobile) &&
+                            {((isMobile && isFilterOpen) || (!isMobile)) &&
                                 <CuisineSelector className="flex gap-2 flex-wrap w-full" />
                             }
                         </div>

@@ -7,6 +7,7 @@ import { useAnimationPrefs } from "../../contexts/AnimationContext";
 import { useSafeAnimations } from "../../hooks/use-safe-animations";
 import { useSearch } from "../../contexts/SearchContext";
 import { SearchInput } from "../ui/SearchInput";
+import { Sparkles } from "lucide-react";
 export default function Header() {
 
     const { searchTerm, setSearchTerm, handleSearch, canSearch } = useSearch();
@@ -28,7 +29,7 @@ export default function Header() {
         <>
             {isMobile && layoutState !== LayoutState.CENTERED &&
                 <div
-                    className="fixed bottom-0 left-0 right-0 container mx-auto px-4 bg-black/100 py-4 border-t-2 border-gray-300/10 min-h-[100px]"
+                    className="fixed bottom-0 left-0 right-0 container mx-auto px-4 bg-black z-10 py-4 border-t-2 border-gray-300/10 min-h-[100px]"
                     style={!prefersReducedMotion ? {
                         opacity: isCentered ? 0 : 1,
                         transform: `translateY(${isCentered ? '100px' : '0'})`,
@@ -37,9 +38,9 @@ export default function Header() {
                         opacity: 1
                     }}
                 >
-                    <div className="max-w-[80%]">
+                    <div className="">
                         <SearchInput
-                            className="text-4xl"
+                            className="text-[16px]"
                             searchTerm={searchTerm}
                             setSearchTerm={setSearchTerm}
                             canSearch={canSearch}
@@ -83,11 +84,14 @@ export default function Header() {
                         <ul className="flex items-center gap-4">
                             <li>
                                 <button
-                                    className={`text-white hover:text-blue-300 interactable ${prefersReducedMotion ? 'text-blue-300' : ''}`}
+                                    className={`button inline-block`}
                                     onClick={toggleReducedMotion}
                                     aria-pressed={prefersReducedMotion}
                                 >
-                                    {prefersReducedMotion ? 'Enable Motion' : 'Reduce Motion'}
+                                    <div className="flex items-center gap-2">
+                                        {prefersReducedMotion && <Sparkles className="w-4 h-4" />}
+                                        {prefersReducedMotion ? 'Enable Motion' : 'Reduce Motion'}
+                                    </div>
                                 </button>
                             </li>
                         </ul>

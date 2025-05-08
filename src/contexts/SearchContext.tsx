@@ -6,7 +6,7 @@ import type { Recipe } from '../services/spoonacular';
 import { LayoutState, useLayout } from './LayoutContext';
 import { useSpoonSearch } from '../hooks/use-spoon-search';
 import { useIsMobile } from '../hooks/use-mobile';
-
+import { AVAILABLE_CUISINES } from '../data/cuisines';
 interface SearchContextType {
   setSearchTerm: (term: string) => void;
   searchTerm: string;
@@ -41,14 +41,17 @@ export function SearchProvider({ children }: { children: React.ReactNode }) {
 
     const showLoader = loading || queryHasChanged || loadingOverride || pagination.pendingPageChange;
 
-    const paginationAvailable = metadata.totalResults > 5;
+    const hasSynced = useRef(false);
+    const paginationAvailable = metadata.totalResults > 5 && query.trim() !== '';
     const isMobile = useIsMobile();
     const isMountingRef = useRef(true);
     const navigate = useNavigate();
     const location = useLocation();
 
     const cuisineParam = useMemo(() => {
-        return cuisines.length > 0 ? cuisines.join(',') : '';
+      const param = cuisines.length > 0 ? cuisines.join(',') : '';
+      console.log("cuisineParam", param, cuisines.length , AVAILABLE_CUISINES.length);
+        return param;
     }, [cuisines]);
 
     const resetSearch = () => {
@@ -68,7 +71,9 @@ export function SearchProvider({ children }: { children: React.ReactNode }) {
     // Auto Search
     useEffect(() => {
 
-        if(!autoSearch || isMobile || location.pathname !== '/' || loading) return;
+        const firstURLSync = isMobile && !hasSynced.current;
+
+        if(!autoSearch || (isMobile && !firstURLSync) || location.pathname !== '/' || loading) return;
 
         pagination.reset();
 
@@ -90,6 +95,8 @@ export function SearchProvider({ children }: { children: React.ReactNode }) {
 
 
     // Set the search term from the URL
+    // Didn't have enough time, URL sync is a bit off
+    // Not great
     useEffect(() => {
         const params = new URLSearchParams(location.search);
         const q = params.get('q');
@@ -108,21 +115,26 @@ export function SearchProvider({ children }: { children: React.ReactNode }) {
                 navigate(`/?q=${encodeURIComponent(q)}&cuisine=${encodeURIComponent(c || '')}`, { replace: true });
             } 
         }
+       
     }, []);
 
     const toggleCuisine = (cuisine: string) => {
       if(cuisine === 'all') {
-        setCuisines([]);
-        return;
-      }
-      setCuisines(prev => {
-        const exists = prev.includes(cuisine);
-        if (exists) {
-          return prev.filter(c => c !== cuisine);
-        } else {
-          return [...prev, cuisine];
+        if(cuisines.length === AVAILABLE_CUISINES.length) {
+          setCuisines([]);
+          return;
         }
-      });
+        setCuisines(Object.values(AVAILABLE_CUISINES));
+      }else {
+        setCuisines(prev => {
+          const exists = prev.includes(cuisine);
+          if (exists) {
+            return prev.filter(c => c !== cuisine);
+          } else {
+            return [...prev, cuisine];
+          }
+        });
+      }
     };
 
 
@@ -153,7 +165,7 @@ export function SearchProvider({ children }: { children: React.ReactNode }) {
       toggleCuisine,
       queryHasChanged,
       hasCuisine,
-      includeAllCuisines: cuisines.length === 0,
+      includeAllCuisines: cuisines.length === AVAILABLE_CUISINES.length || cuisines.length === 0,
       canSearch,
       pagination: {
         reset: pagination.reset,

@@ -95,13 +95,13 @@ export default function RecipeDetails() {
 
         <div className="p-6">
           <div className="flex flex-wrap gap-2 mb-6">
-            <span className="inline-flex items-center bg-blue-100 text-blue-800 px-3 py-1 rounded-full">
+            <span className="glassy-badge">
               ⏱️ {recipe.readyInMinutes} mins
             </span>
-            <span className="inline-flex items-center bg-green-100 text-green-800 px-3 py-1 rounded-full">
+            <span className="glassy-badge">
               ❤️ {recipe.healthScore}% Health Score
             </span>
-            <span className="inline-flex items-center bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full">
+            <span className="glassy-badge">
               👥 {recipe.servings} servings
             </span>
           </div>
@@ -194,7 +194,7 @@ export default function RecipeDetails() {
                                     <span className="text-sm text-gray-600 mr-2">Ingredients:</span>
                                     <div className="flex flex-wrap gap-1">
                                       {step.ingredients.map((ing, i) => (
-                                        <span key={i} className="text-sm bg-blue-50 text-blue-700 px-2 py-0.5 rounded">
+                                        <span key={i} className="text-sm glassy-badge">
                                           {ing.name}
                                         </span>
                                       ))}
@@ -207,7 +207,7 @@ export default function RecipeDetails() {
                                     <span className="text-sm text-gray-600 mr-2">Equipment:</span>
                                     <div className="flex flex-wrap gap-1">
                                       {step.equipment.map((eq, i) => (
-                                        <span key={i} className="text-sm bg-gray-50 text-gray-700 px-2 py-0.5 rounded">
+                                        <span key={i} className="text-sm glassy-badge">
                                           {eq.name}
                                         </span>
                                       ))}

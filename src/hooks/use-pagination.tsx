@@ -20,7 +20,7 @@ export function usePagination(pageSize: number, totalResults: number): Paginatio
 
   const [currentPage, setCurrentPage] = useState(1);
 
-  const [activePage, pendingPageChange, resetActivePage] = useDebounce(currentPage, 800);
+  const [activePage, pendingPageChange, resetActivePage] = useDebounce(currentPage, 1000);
 
   const offset = (currentPage - 1) * pageSize;
 
