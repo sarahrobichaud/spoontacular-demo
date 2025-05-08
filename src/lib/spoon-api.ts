@@ -9,7 +9,6 @@ async function fetchSpoonacular<T>(endpoint: string, params = {}, options: Reque
     'x-api-key': API_KEY
   };
 
-  console.log(headers);
 
   Object.entries(params).forEach(([key, value]) => {
     url.searchParams.append(key, String(value));

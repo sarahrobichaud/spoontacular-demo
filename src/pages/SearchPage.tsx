@@ -1,42 +1,26 @@
-import { useCallback, useEffect, useMemo, useState, type FormEvent } from "react";
+import { use, useCallback, useEffect, useMemo, useState, type FormEvent } from "react";
 import { useLocation } from "react-router";
 import { motion, AnimatePresence } from "framer-motion";
-import { useLayout } from "../contexts/LayoutContext";
+import { LayoutState, useLayout } from "../contexts/LayoutContext";
 import RecipeIdeasPrompt from "../components/RecipeIdeaPrompt";
 import { CustomLoader } from "../components/ui/CustomLoader";
 import { RecipeCard } from "../components/RecipeCard";
 import { useAnimationPrefs } from "../contexts/AnimationContext";
 import { useSearch } from "../contexts/SearchContext";
 
-const mockImg = "https://placehold.co/200x150"
-
-export interface Recipe {
-    id: number;
-    title: string;
-    image: string;
-    minutes: number;
-    healthScore: number;
-}
-
-const mockRecipes: Recipe[] = [
-    { id: 1, title: "Pasta Carbonara", image: mockImg, minutes: 30, healthScore: 45 },
-    { id: 2, title: "Chicken Curry", image: mockImg, minutes: 45, healthScore: 70 },
-    { id: 3, title: "Vegetable Stir Fry", image: mockImg, minutes: 20, healthScore: 90 },
-    { id: 4, title: "Beef Tacos", image: mockImg, minutes: 25, healthScore: 60 },
-    { id: 5, title: "Mushroom Risotto", image: mockImg, minutes: 40, healthScore: 75 },
-    { id: 6, title: "Greek Salad", image: mockImg, minutes: 15, healthScore: 95 },
-];
+import type { Recipe } from "../services/spoonacular";
+import { useSpoonSearch } from "../hooks/use-spoon-search";
+import { usePagination } from "../hooks/use-pagination";
+import { i } from "framer-motion/client";
+import { LoaderCircle } from "lucide-react";
 
 
-export function SearchSection() {
 
-    const { searchTerm, setSearchTerm, triggerSearch } = useSearch();
+
+export function SearchSection({ handleSearch }: { handleSearch: () => void }) {
+
+    const { searchTerm, setSearchTerm, } = useSearch();
     const { prefersReducedMotion } = useAnimationPrefs();
-
-    const handleSearch = (e: FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
-        triggerSearch();
-    };
 
     return (
         <motion.div
@@ -79,10 +63,37 @@ export function SearchSection() {
 
 export default function SearchPage() {
     const { isCentered } = useLayout();
-    const {  searchTerm, setSearchTerm,  isLoading, data, reset} = useSearch();
+    const { searchTerm, setSearchTerm, queryHasChanged, query} = useSearch();
+    const [data, setData] = useState<Recipe[]>([]);
+    const [autoSearch, setAutoSearch] = useState(false);
+    const {setLayoutState} = useLayout();
 
     const location = useLocation();
     const { prefersReducedMotion } = useAnimationPrefs();
+
+    const { loading, isInitialSearch,  metadata, searchResults, reset , searchRecipes} = useSpoonSearch();
+    const pagination = usePagination(5, metadata.totalResults);
+
+    const showLoader = loading || queryHasChanged;
+    console.log({loading, queryHasChanged});
+
+    const paginationAvailable = metadata.totalResults > 5;
+
+    // Auto Search
+    useEffect(() => {
+
+        if(!autoSearch) return;
+
+        searchRecipes({ query, page: pagination.currentPage, pageSize: 5 });
+
+    }, [query, autoSearch]);
+
+
+    // Update the results
+    useEffect(() => {
+        setData(searchResults);
+        console.log(searchResults);
+    }, [searchResults]);
 
 
     // Set the search term from the URL
@@ -91,52 +102,104 @@ export default function SearchPage() {
         const q = params.get('q');
 
         if (q) {
+            setLayoutState(LayoutState.HEADER)
             setSearchTerm(q);
-        }else if(location.pathname === '/') {
+            setAutoSearch(true);
+        } else if (location.pathname === '/') {
             reset();
         }
     }, [location, setSearchTerm]);
 
-    return (
-        <div className="w-full">
-            <AnimatePresence mode="wait">
-                {isCentered ? (
-                    <SearchSection  />
-                ) : (
+    useEffect(() => {
+        console.log("active page changed");
 
-                    isLoading ? (
-                        <div className="flex justify-center items-center h-full">
-                            <CustomLoader />
+        // if(pagination.activePage === pagination.currentPage) return;    
+        searchRecipes({ query, page: pagination.activePage, pageSize: 5 });
+        
+    }, [pagination.activePage]);
+
+    const handleSearch = () => {
+        if(isInitialSearch) {
+            setLayoutState(LayoutState.HEADER)
+            setAutoSearch(true);
+        }
+        searchRecipes({ query: searchTerm, page: 1, pageSize: 5 });
+    }
+
+
+    return (
+        <div className="w-full min-h-screen">
+            <AnimatePresence mode="wait">
+                <div className={`grid grid-cols-1 ${isCentered || searchTerm === '' || !paginationAvailable? 'lg:grid-cols-[1fr]' : 'lg:grid-cols-[3fr_1fr] gap-16'} max-h-full h-full`}>
+                    <div>
+                        {isCentered && <SearchSection handleSearch={handleSearch}/>}
+                        {!isCentered && !showLoader && searchTerm === '' && <RecipeIdeasPrompt />}
+                        {!isCentered && searchTerm !== '' &&
+                            <motion.div
+                                key="results"
+                                className="w-full"
+                                initial={prefersReducedMotion ? {} : { opacity: 0, y: 20 }}
+                                animate={prefersReducedMotion ? {} : { opacity: 1, y: 0 }}
+                                exit={prefersReducedMotion ? {} : { opacity: 0 }}
+                                transition={prefersReducedMotion ? { duration: 0 } : { duration: 0.2 }}
+                            >
+                            <SearchResults data={data} isLoading={showLoader}  />
+                            </motion.div>}
+                    </div>
+                    {paginationAvailable && !isCentered && searchTerm !== '' && (
+                        <div className="sticky top-[2rem] w-full h-full">
+                            <h2 className="text-xl font-semibold mb-2">Results</h2>
+                            <div className="flex items-center gap-2">
+                                <p className="text-gray-600">Page {pagination.currentPage} of {pagination.totalPages}</p>
+                                {pagination.pendingPageChange && <LoaderCircle className="w-4 h-4 animate-spin" />}
+                            </div>
+                            <div className="flex gap-2 w-full">
+                                <button
+                                    onClick={pagination.handlePreviousPage}
+                                    disabled={!pagination.canGoToPreviousPage}
+                                    className="w-full hover:cursor-pointer bg-gray-500/20 backdrop-blur-sm text-gray-700 dark:text-gray-200 px-4 py-2 rounded-lg border border-gray-300/30 shadow-sm hover:bg-gray-500/30 focus:outline-none focus:ring-2 focus:ring-gray-400/50 focus:border-transparent transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-gray-500/20"
+                                >
+                                    Previous
+                                </button>
+                                <button
+                                    onClick={pagination.handleNextPage}
+                                    disabled={!pagination.canGoToNextPage}
+                                    className="w-full hover:cursor-pointer bg-gray-500/20 backdrop-blur-sm text-gray-700 dark:text-gray-200 px-4 py-2 rounded-lg border border-gray-300/30 shadow-sm hover:bg-gray-500/30 focus:outline-none focus:ring-2 focus:ring-gray-400/50 focus:border-transparent transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-gray-500/20"
+                                >
+                                    Next
+                                </button>
+                            </div>
                         </div>
-                    ) : searchTerm === '' ? (
-                        <RecipeIdeasPrompt />
-                    ) : (
-                        <motion.div
-                            key="results"
-                            className="w-full"
-                            initial={prefersReducedMotion ? {} : { opacity: 0, y: 20 }}
-                            animate={prefersReducedMotion ? {} : { opacity: 1, y: 0 }}
-                            exit={prefersReducedMotion ? {} : { opacity: 0 }}
-                            transition={prefersReducedMotion ? { duration: 0 } : { duration: 0.2 }}
-                        >
-                            {data && data.results.length > 0 ? (
-                                <div>
-                                    <h2 className="text-xl font-semibold mb-4">Search Results</h2>
-                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                                        {data.results.map(recipe => (
-                                            <RecipeCard key={recipe.id} recipe={recipe} />
-                                        ))}
-                                    </div>
-                                </div>
-                            ) : searchTerm ? (
-                                <div className="text-center py-12">
-                                    <h2 className="text-xl font-semibold mb-2">No recipes found</h2>
-                                    <p className="text-gray-600">Try a different search term</p>
-                                </div>
-                            ) : null}
-                        </motion.div>
-                    ))}
+                    )}
+                </div>
             </AnimatePresence>
         </div>
     );
+}
+
+function SearchResults({ data, isLoading }: { data: Recipe[], isLoading: boolean }) {
+
+    console.log({data,isLoading});
+    if (data.length === 0 && !isLoading) {
+        return (
+            <div className="text-center py-12">
+                <h2 className="text-xl font-semibold mb-2">No recipes found</h2>
+                <p className="text-gray-600">Try a different search term</p>
+            </div>
+        )
+    } else {
+        return (
+            <div className="w-full">
+                <h2 className="text-xl font-semibold mb-4">Search Results</h2>
+                {isLoading && <CustomLoader />}
+                {!isLoading && <div className="grid grid-cols-1 gap-4">
+                    {data.map((recipe: Recipe) => {
+                        return (
+                            <RecipeCard key={recipe.id} recipe={recipe} />
+                        )
+                    })}
+                </div>}
+            </div>
+        )
+    }
 }

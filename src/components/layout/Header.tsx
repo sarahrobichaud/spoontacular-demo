@@ -2,14 +2,14 @@ import { AnimatePresence, motion} from "framer-motion"
 import { useLayout } from "../../contexts/LayoutContext";
 import { LayoutState } from "../../contexts/LayoutContext";
 import { useIsMobile } from "../../hooks/use-mobile";
-import { Link } from "react-router";
 import type { FormEvent } from "react";
 import { useAnimationPrefs } from "../../contexts/AnimationContext";
 import { useSafeAnimations } from "../../hooks/use-safe-animations";
 import { useSearch } from "../../contexts/SearchContext";
+import { Link } from "react-router";
 export default function Header() {
 
-    const { searchTerm, setSearchTerm, reset , triggerSearch} = useSearch();
+    const { searchTerm, setSearchTerm } = useSearch();
     const { layoutState , isCentered} = useLayout();
 
 
@@ -62,10 +62,10 @@ export default function Header() {
 
             <header className="py-4 bg-blur-lg backdrop-blur-sm bg-black/50 border-b-2 border-gray-300/10">
                 <div className="container mx-auto px-4 flex justify-between items-center">
-                    <Link to="/" className="flex items-center gap-2">
+                    <a href="/" className="flex items-center gap-2">
                         <img src="/logo.svg" alt="RecipeFinder Logo" className={`w-10 h-10 logo ${getNoMotionOverride()}`} />
                         <span className="text-2xl font-bold">RecipeFinder</span>
-                    </Link>
+                    </a>
                     {!isMobile &&
                         <AnimatePresence>
                             {layoutState === 'header' && (

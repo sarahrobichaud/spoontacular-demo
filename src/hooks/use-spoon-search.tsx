@@ -1,5 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { complexSearch, type RecipeSearchResponse } from '../services/spoonacular';
+import type { Recipe } from '../services/spoonacular';
+import { mockRecipes } from '../data/mockRecipes';
 
 interface SearchParams {
   query: string;
@@ -8,80 +10,23 @@ interface SearchParams {
   [key: string]: any;
 }
 
-// Mock data for development
-const mockRecipes = [
-  {
-    id: 1,
-    title: "Pasta Carbonara",
-    image: "https://placehold.co/400x300",
-    imageType: "jpg",
-    servings: 4,
-    readyInMinutes: 30,
-    sourceName: "Food Blog",
-    sourceUrl: "https://example.com/pasta-carbonara",
-    spoonacularScore: 85,
-    healthScore: 45
-  },
-  {
-    id: 2,
-    title: "Chicken Curry",
-    image: "https://placehold.co/400x300",
-    imageType: "jpg",
-    servings: 6,
-    readyInMinutes: 45,
-    sourceName: "Curry House",
-    sourceUrl: "https://example.com/chicken-curry",
-    spoonacularScore: 90,
-    healthScore: 70
-  },
-  {
-    id: 3,
-    title: "Vegetable Stir Fry",
-    image: "https://placehold.co/400x300",
-    imageType: "jpg",
-    servings: 2,
-    readyInMinutes: 20,
-    sourceName: "Healthy Eats",
-    sourceUrl: "https://example.com/veggie-stir-fry",
-    spoonacularScore: 95,
-    healthScore: 90
-  },
-  {
-    id: 4,
-    title: "Beef Tacos",
-    image: "https://placehold.co/400x300",
-    imageType: "jpg",
-    servings: 4,
-    readyInMinutes: 25,
-    sourceName: "Mexican Kitchen",
-    sourceUrl: "https://example.com/beef-tacos",
-    spoonacularScore: 88,
-    healthScore: 60
-  },
-  {
-    id: 5,
-    title: "Mushroom Risotto",
-    image: "https://placehold.co/400x300",
-    imageType: "jpg",
-    servings: 4,
-    readyInMinutes: 40,
-    sourceName: "Italian Cuisine",
-    sourceUrl: "https://example.com/mushroom-risotto",
-    spoonacularScore: 92,
-    healthScore: 75
-  }
-];
-
 // Function to generate mock search response
-const generateMockResponse = (query: string, offset: number, number: number): RecipeSearchResponse => {
+const generateMockResponse = async (query: string, offset: number, number: number): Promise<RecipeSearchResponse> => {
   // Filter recipes based on query to simulate search
   const filteredRecipes = mockRecipes.filter(recipe => 
     recipe.title.toLowerCase().includes(query.toLowerCase())
   );
+
   
   // Paginate results
-  const paginatedResults = filteredRecipes.slice(offset, offset + number);
-  
+  let paginatedResults: Recipe[] = [];
+  if(filteredRecipes.length > 5) {
+    paginatedResults = filteredRecipes.slice(offset, offset + number);
+  } else {
+    paginatedResults = filteredRecipes;
+  }
+
+  await new Promise(resolve => setTimeout(resolve, 300));
   return {
     results: paginatedResults,
     offset,
@@ -92,19 +37,24 @@ const generateMockResponse = (query: string, offset: number, number: number): Re
 
 
 export function useSpoonSearch() {
-  const [results, setResults] = useState<RecipeSearchResponse | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isInitialSearch, setIsInitialSearch] = useState(true);
+  const [lastQuery, setLastQuery] = useState('');
+
+  const [totalResults, setTotalResults] = useState<number | 0>(0);
+  const [offset, setOffset] = useState(0);
+  const [results, setResults] = useState<Recipe[]>([]);
+
 
   const reset = () => {
-    setResults(null);
+    setResults([]);
     setLoading(false);
     setError(null);
     setIsInitialSearch(true);
   }
 
-  const searchRecipes = useCallback(async ({ 
+  const searchRecipes = async ({ 
     query, 
     page = 1, 
     pageSize = 10,
@@ -112,35 +62,56 @@ export function useSpoonSearch() {
     if (!query?.trim()) return;
     
     setLoading(true);
+
+    if(query !== lastQuery) {
+        setOffset(0);
+    }
+
     setError(null);
     
     try {
       const offset = (page - 1) * pageSize;
-      
-      const data = await complexSearch({ 
-        query,
-        offset,
-        number: pageSize,
-      });
 
-      const mockresults = generateMockResponse(query, offset, pageSize);
-
-      console.log(mockresults);
+      // If it gets out of sync, clip it 
+      const maxOffset = totalResults ? totalResults - pageSize : null;
+      if(maxOffset && offset > maxOffset) {
+        setOffset(maxOffset);
+      }
       
-      setResults(data);
+    //   const data = await complexSearch({ 
+    //     query,
+    //     offset,
+    //     number: pageSize,
+    //   });
+
+
+      const mockData = await generateMockResponse(query, offset, pageSize);
+
+      const { results, ...newMetadata } = mockData;
+      
+      setResults(results);
+      setTotalResults(newMetadata.totalResults);
+      setOffset(newMetadata.offset);
+      setIsInitialSearch(false);
+      setLastQuery(query);
+
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An unknown error occurred');
     } finally {
-      setIsInitialSearch(false);
       setLoading(false);
     }
-  }, []);
+  }
+
 
   return { 
     searchRecipes,
     loading, 
     error, 
     searchResults: results,
+    metadata: {
+      totalResults,
+      offset,
+    },
     isInitialSearch,
     reset
   };
