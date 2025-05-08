@@ -1,3 +1,7 @@
+.html {
+  background-color: #000;
+}
+
 .logo {
     transform: scale(0.95) rotate(-5deg);
     filter: hue-rotate(70deg);

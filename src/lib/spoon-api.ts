@@ -1,5 +1,8 @@
 const BASE_URL = 'https://api.spoonacular.com'
-const API_KEY = import.meta.env.VITE_SPOON_API_KEY
+
+function getApiKey() {
+	return localStorage.getItem('spoonacular_api_key') || import.meta.env.VITE_SPOON_API_KEY || '';
+}
 
 async function fetchSpoonacular<T>(
 	endpoint: string,
@@ -7,6 +10,11 @@ async function fetchSpoonacular<T>(
 	options: RequestInit = { method: 'GET' }
 ): Promise<T> {
 	const url = new URL(`${BASE_URL}${endpoint}`)
+	const API_KEY = getApiKey();
+
+	if (!API_KEY) {
+		throw new Error('API key is missing');
+	}
 
 	const headers = {
 		'Content-Type': 'application/json',
