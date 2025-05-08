@@ -11,12 +11,16 @@ import './styles/tailwind.css'
 import { AppProvider } from './contexts/AppProvider'
 
 const AppContent = () => {
-	const { apiKey, isLoaded } = useApiKey();
-	
+	const { apiKey, isLoaded } = useApiKey()
+
 	if (!isLoaded) {
-		return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
+		return (
+			<div className='min-h-screen flex items-center justify-center'>
+				Loading...
+			</div>
+		)
 	}
-	
+
 	const defaultElement = (
 		<AppProvider>
 			<DefaultLayout>
@@ -24,7 +28,7 @@ const AppContent = () => {
 			</DefaultLayout>
 		</AppProvider>
 	)
-	
+
 	const errorElement = (
 		<AppProvider>
 			<DefaultLayout>
@@ -32,7 +36,7 @@ const AppContent = () => {
 			</DefaultLayout>
 		</AppProvider>
 	)
-	
+
 	const router = createBrowserRouter([
 		{
 			path: '/recipe/:id',
@@ -58,15 +62,15 @@ const AppContent = () => {
 		},
 	])
 
-	return <RouterProvider router={router} />;
-};
+	return <RouterProvider router={router} />
+}
 
 function App() {
 	return (
 		<ApiKeyProvider>
 			<AppContent />
 		</ApiKeyProvider>
-	);
+	)
 }
 
 export default App

@@ -21,16 +21,16 @@ export default function Footer() {
 						Sarah Robichaud
 					</a>
 					{isMobile && apiKey && (
-					<button
-						type='button'
-						className='mt-4 button inline-block w-full'
-						onClick={clearApiKey}
-					>
-						<div className='flex items-center gap-2'>
-							<TrashIcon className='w-4 h-4' />
-							<span>Swap API Key</span>
-						</div>
-					</button>
+						<button
+							type='button'
+							className='mt-4 button inline-block w-full'
+							onClick={clearApiKey}
+						>
+							<div className='flex items-center gap-2'>
+								<TrashIcon className='w-4 h-4' />
+								<span>Swap API Key</span>
+							</div>
+						</button>
 					)}
 				</p>
 			</div>

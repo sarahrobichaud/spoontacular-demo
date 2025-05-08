@@ -158,7 +158,7 @@ export default function RecipeDetails() {
 					<div className='mb-8'>
 						<h2 className='text-xl font-semibold mb-2'>Summary</h2>
 						{/* // Only usee this is safe data (xss) */}
-						{/* biome-ignore lint/security/noDangerouslySetInnerHtml: This is safe data from the API */}
+
 						<div
 							className='text-gray-400'
 							dangerouslySetInnerHTML={{ __html: recipe.summary }}

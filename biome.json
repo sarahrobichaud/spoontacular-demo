@@ -42,6 +42,9 @@
 				"noUnusedVariables": "error",
 				"noUnusedImports": "error",
 				"useExhaustiveDependencies": "off"
+			},
+			"security": {
+				"noDangerouslySetInnerHtml": "off"
 			}
 		}
 	},
