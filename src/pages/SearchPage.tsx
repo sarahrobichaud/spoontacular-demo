@@ -33,10 +33,6 @@ export default function SearchPage() {
 
 	const isMobile = useIsMobile()
 
-	useEffect(() => {
-		console.log(isMobile, isFilterOpen)
-	}, [isMobile, isFilterOpen])
-
 	return (
 		<div className='w-full min-h-screen'>
 			<AnimatePresence mode='wait'>

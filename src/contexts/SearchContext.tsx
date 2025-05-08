@@ -67,12 +67,6 @@ export function SearchProvider({ children }: { children: React.ReactNode }) {
 
 	const cuisineParam = useMemo(() => {
 		const param = cuisines.length > 0 ? cuisines.join(',') : ''
-		console.log(
-			'cuisineParam',
-			param,
-			cuisines.length,
-			AVAILABLE_CUISINES.length
-		)
 		return param
 	}, [cuisines])
 
@@ -104,7 +98,6 @@ export function SearchProvider({ children }: { children: React.ReactNode }) {
 
 		pagination.reset()
 
-		console.log('autoSearch', query)
 		searchRecipes({
 			query,
 			page: pagination.activePage,
@@ -184,7 +177,6 @@ export function SearchProvider({ children }: { children: React.ReactNode }) {
 			navigate(`/?q=${encodeURIComponent(searchTerm)}`, { replace: true })
 		}
 
-		console.log('handleSearch', searchTerm)
 		searchRecipes({
 			query: searchTerm,
 			page: 1,

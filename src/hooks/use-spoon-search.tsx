@@ -76,7 +76,6 @@ export function useSpoonSearch() {
 
 			let data: RecipeSearchResponse
 
-			console.log('--use spoon search--')
 			if (!env.useMockData) {
 				data = await complexSearch({
 					query,
