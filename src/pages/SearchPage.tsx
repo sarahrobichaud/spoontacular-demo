@@ -62,78 +62,29 @@ export function SearchSection({ handleSearch }: { handleSearch: () => void }) {
 }
 
 export default function SearchPage() {
-    const { isCentered } = useLayout();
-    const { searchTerm, setSearchTerm, queryHasChanged, query} = useSearch();
-    const [data, setData] = useState<Recipe[]>([]);
-    const [autoSearch, setAutoSearch] = useState(false);
-    const {setLayoutState} = useLayout();
+    const { searchTerm, setSearchTerm, queryHasChanged, query, pagination, handleSearch, loading, data, reset } = useSearch();
 
-    const location = useLocation();
+    const { layoutState, isCentered } = useLayout();
+
+    useEffect(() => {
+    // Scroll to top when page changes
+      window.scrollTo({
+        top: 0,
+        behavior: prefersReducedMotion ? 'auto' : 'smooth'
+      });
+    }, [pagination.currentPage]);
+
     const { prefersReducedMotion } = useAnimationPrefs();
 
-    const { loading, isInitialSearch,  metadata, searchResults, reset , searchRecipes} = useSpoonSearch();
-    const pagination = usePagination(5, metadata.totalResults);
-
-    const showLoader = loading || queryHasChanged;
-    console.log({loading, queryHasChanged});
-
-    const paginationAvailable = metadata.totalResults > 5;
-
-    // Auto Search
-    useEffect(() => {
-
-        if(!autoSearch) return;
-
-        searchRecipes({ query, page: pagination.currentPage, pageSize: 5 });
-
-    }, [query, autoSearch]);
-
-
-    // Update the results
-    useEffect(() => {
-        setData(searchResults);
-        console.log(searchResults);
-    }, [searchResults]);
-
-
-    // Set the search term from the URL
-    useEffect(() => {
-        const params = new URLSearchParams(location.search);
-        const q = params.get('q');
-
-        if (q) {
-            setLayoutState(LayoutState.HEADER)
-            setSearchTerm(q);
-            setAutoSearch(true);
-        } else if (location.pathname === '/') {
-            reset();
-        }
-    }, [location, setSearchTerm]);
-
-    useEffect(() => {
-        console.log("active page changed");
-
-        // if(pagination.activePage === pagination.currentPage) return;    
-        searchRecipes({ query, page: pagination.activePage, pageSize: 5 });
-        
-    }, [pagination.activePage]);
-
-    const handleSearch = () => {
-        if(isInitialSearch) {
-            setLayoutState(LayoutState.HEADER)
-            setAutoSearch(true);
-        }
-        searchRecipes({ query: searchTerm, page: 1, pageSize: 5 });
-    }
-
+    console.log({pagination})
 
     return (
         <div className="w-full min-h-screen">
             <AnimatePresence mode="wait">
-                <div className={`grid grid-cols-1 ${isCentered || searchTerm === '' || !paginationAvailable? 'lg:grid-cols-[1fr]' : 'lg:grid-cols-[3fr_1fr] gap-16'} max-h-full h-full`}>
+                <div className={`grid grid-cols-1 ${isCentered || searchTerm === '' || data.length === 0 ? 'lg:grid-cols-[1fr]' : 'lg:grid-cols-[3fr_1fr] gap-16'} max-h-full h-full`}>
                     <div>
                         {isCentered && <SearchSection handleSearch={handleSearch}/>}
-                        {!isCentered && !showLoader && searchTerm === '' && <RecipeIdeasPrompt />}
+                        {!isCentered && !loading && searchTerm === '' && <RecipeIdeasPrompt />}
                         {!isCentered && searchTerm !== '' &&
                             <motion.div
                                 key="results"
@@ -143,10 +94,10 @@ export default function SearchPage() {
                                 exit={prefersReducedMotion ? {} : { opacity: 0 }}
                                 transition={prefersReducedMotion ? { duration: 0 } : { duration: 0.2 }}
                             >
-                            <SearchResults data={data} isLoading={showLoader}  />
+                            <SearchResults data={data} isLoading={loading}  />
                             </motion.div>}
                     </div>
-                    {paginationAvailable && !isCentered && searchTerm !== '' && (
+                    {pagination.available && !isCentered && searchTerm !== '' && (
                         <div className="sticky top-[2rem] w-full h-full">
                             <h2 className="text-xl font-semibold mb-2">Results</h2>
                             <div className="flex items-center gap-2">

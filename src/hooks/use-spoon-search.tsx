@@ -59,23 +59,25 @@ export function useSpoonSearch() {
     page = 1, 
     pageSize = 10,
   }: {query: string, page: number, pageSize: number, [key: string]: any}) => {
+
+    let resetOffset = false;
     if (!query?.trim()) return;
     
     setLoading(true);
 
     if(query !== lastQuery) {
-        setOffset(0);
+      resetOffset = true;
     }
 
     setError(null);
     
     try {
-      const offset = (page - 1) * pageSize;
+      let offset = resetOffset ? 0 : (page - 1) * pageSize;
 
-      // If it gets out of sync, clip it 
       const maxOffset = totalResults ? totalResults - pageSize : null;
+
       if(maxOffset && offset > maxOffset) {
-        setOffset(maxOffset);
+        offset = 0;
       }
       
     //   const data = await complexSearch({ 

@@ -29,6 +29,6 @@ export function usePagination(pageSize: number, totalResults: number) {
     resetActivePage(1);
   }
 
-  return { currentPage, activePage, pendingPageChange, resetActivePage, totalPages, canGoToNextPage, canGoToPreviousPage, handleNextPage, handlePreviousPage, offset, totalResults};
+  return { currentPage, activePage, pendingPageChange, reset, totalPages, canGoToNextPage, canGoToPreviousPage, handleNextPage, handlePreviousPage, offset, totalResults};
 }
 

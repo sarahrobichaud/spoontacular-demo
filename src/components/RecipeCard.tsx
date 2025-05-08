@@ -27,7 +27,7 @@ export function RecipeCard({ recipe, ...props }: RecipeCardProps) {
     return (
     <motion.div
       ref={ref}
-      className={`bg-black/10 hover:bg-black/50 border-2 border-gray-300/10 rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow scale-[0.95] hover:scale-[1] transition-transform ${getNoMotionOverride()} ${props.className}`}
+      className={`bg-black/10 hover:bg-black/50 border-2 border-gray-300/10 rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow transition-transform ${getNoMotionOverride()} ${props.className}`}
       initial={ prefersReducedMotion ? {} : { opacity: 0 }}
       animate={ prefersReducedMotion ? {} : { opacity: 1 }}
       transition={prefersReducedMotion ? {duration: 0 }:{ duration: 0.3, delay: 0.1 }}
