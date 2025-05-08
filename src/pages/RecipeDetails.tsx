@@ -12,6 +12,7 @@ export default function RecipeDetails() {
   const { layoutState, setLayoutState } = useLayout();
   const { prefersReducedMotion } = useAnimationPrefs();
   const { recipe, loading, error } = useRecipeDetails(id);
+  const {query} = useSearch();
 
   useEffect(() => {
     if (layoutState === 'centered') {
@@ -50,7 +51,6 @@ export default function RecipeDetails() {
     ].filter(Boolean)
   ];
 
-  const {query} = useSearch();
 
   return (
     <motion.div
@@ -59,11 +59,11 @@ export default function RecipeDetails() {
       exit={prefersReducedMotion ? {} : { opacity: 0 }}
       transition={prefersReducedMotion ? { duration: 0 } : { duration: 0.3 }}
     >
-      <Link to={query ? `/search?q=${query}` : '/'} className="text-blue-500 hover:underline inline-flex items-center mb-6">
+      <Link to={query ? `/search?q=${query}` : '/'} className="button flex items-center gap-2">
         <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
           <path fillRule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clipRule="evenodd" />
         </svg>
-        Back to search
+        <span>Back to search</span>
       </Link>
 
       <div className="bg-black/10 border-2 border-gray-300/10 rounded-lg shadow-lg overflow-hidden">
@@ -117,15 +117,15 @@ export default function RecipeDetails() {
 
           <div className="mb-8">
             <h2 className="text-xl font-semibold mb-2">Summary</h2>
-              <p className="text-gray-400">{recipe.summary}</p>
+          {/* // Only usee this is safe data (xss) */}
+            <div className="text-gray-400" dangerouslySetInnerHTML={{ __html: recipe.summary }} /> 
           </div>
 
           <div className="mb-8">
             <h2 className="text-xl font-semibold mb-4">Ingredients</h2>
             <div className="bg-gray-700/50 p-4 rounded-lg">
               <ul className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                {recipe.extendedIngredients.map((ingredient) => {
-
+                {recipe.extendedIngredients.map((ingredient , index) => { 
                   const capitalizedName = ingredient.name
                     .split(' ')
                     .map(word => word.charAt(0).toUpperCase() + word.slice(1))
@@ -133,7 +133,7 @@ export default function RecipeDetails() {
 
 
                   return (
-                  <li key={ingredient.id} className="flex items-start">
+                  <li key={`${ingredient.id}-${index}`} className="flex items-start">
                     <img
                       src={`https://spoonacular.com/cdn/ingredients_100x100/${ingredient.image}`}
                       alt={capitalizedName}

@@ -6,7 +6,6 @@ import type { FormEvent } from "react";
 import { useAnimationPrefs } from "../../contexts/AnimationContext";
 import { useSafeAnimations } from "../../hooks/use-safe-animations";
 import { useSearch } from "../../contexts/SearchContext";
-import { useLocation } from "react-router";
 export default function Header() {
 
     const { searchTerm, setSearchTerm, handleSearch } = useSearch();
@@ -19,9 +18,6 @@ export default function Header() {
 
     const { getNoMotionOverride } = useSafeAnimations();
 
-    const pathname = useLocation().pathname;
-
-
     const search = (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         handleSearch();
@@ -29,7 +25,7 @@ export default function Header() {
 
     return (
         <>
-            {isMobile && layoutState !== LayoutState.CENTERED && pathname === '/' &&
+            {isMobile && layoutState !== LayoutState.CENTERED &&
                 <div
                     className="fixed bottom-0 left-0 right-0 container mx-auto px-4 bg-black/100 py-4 border-t-2 border-gray-300/10 min-h-[100px]"
                     style={!prefersReducedMotion ? {
@@ -40,7 +36,7 @@ export default function Header() {
                         opacity: 1
                     }}
                 >
-                    <div className="w-full flex justify-between items-center">
+                    <form onSubmit={search} className="w-full flex justify-between items-center">
                         <input
                             type="search"
                             className="w-full px-4 py-2 rounded-md border text-[24px] border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-black/100"
@@ -58,7 +54,7 @@ export default function Header() {
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                             </svg>
                         </button>
-                    </div>
+                    </form>
                 </div>
             }
 
@@ -68,7 +64,7 @@ export default function Header() {
                         <img src="/logo.svg" alt="RecipeFinder Logo" className={`w-10 h-10 logo ${getNoMotionOverride()}`} />
                         <span className="text-2xl font-bold">RecipeFinder</span>
                     </a>
-                    {!isMobile && pathname === '/' &&
+                    {!isMobile &&
                         <AnimatePresence>
                             {layoutState === 'header' && (
                                 <motion.form

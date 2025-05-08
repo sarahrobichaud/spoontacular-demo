@@ -9,7 +9,6 @@ export default function ErrorPage() {
   let status = '';
   
   if (isRouteErrorResponse(error)) {
-    console.log(error);
     status = error.status.toString();
     statusText = error.statusText;
     errorMessage = error.data?.message || 'Sorry, this page doesn\'t exist or an error occurred';

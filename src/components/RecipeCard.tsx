@@ -45,6 +45,9 @@ export function RecipeCard({ recipe, ...props }: RecipeCardProps) {
               alt={recipe.title} 
               className="w-24 h-24 object-cover rounded-md" 
               loading="lazy"
+              onError={(e) => {
+                e.currentTarget.src = `http://placehold.co/200x200`;
+              }}
             />
           </div>
           <div className="flex-grow">

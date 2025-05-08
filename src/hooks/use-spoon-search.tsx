@@ -3,6 +3,7 @@ import { complexSearch, type RecipeSearchResponse } from '../services/spoonacula
 import type { Recipe } from '../services/spoonacular';
 import { mockRecipes } from '../data/mockRecipes';
 import { data, useLocation, useNavigate } from 'react-router';
+import { env } from '../env';
 
 
 const generateMockResponse = async (query: string, offset: number, number: number): Promise<RecipeSearchResponse> => {
@@ -66,21 +67,20 @@ export function useSpoonSearch() {
     try {
       let offset = resetOffset ? 0 : (page - 1) * pageSize;
 
-      const maxOffset = totalResults ? totalResults - pageSize : null;
+      let data: RecipeSearchResponse;
 
-      if(maxOffset && offset > maxOffset) {
-        offset = 0;
+      console.log("--use spoon search--");
+      if(!env.useMockData) {
+        data = await complexSearch({ 
+          query,
+          offset,
+          number: pageSize,
+        });
+      } else {
+        data = await generateMockResponse(query, offset, pageSize);
       }
-      
-    //   const data = await complexSearch({ 
-    //     query,
-    //     offset,
-    //     number: pageSize,
-    //   });
 
-
-
-      const { results, ...newMetadata } = await generateMockResponse(query, offset, pageSize);
+      const { results, ...newMetadata } = data;
       
       setResults(results);
       setTotalResults(newMetadata.totalResults);

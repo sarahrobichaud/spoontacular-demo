@@ -1,33 +1,34 @@
-export type PaginationProps = { 
-    currentPage: number;
-    totalPages: number;
-    onPageChange: (page: number) => void;
-}
+import { LoaderCircle } from "lucide-react";
+import type { PaginationInfo } from "../../hooks/use-pagination";
+import type { HTMLAttributes } from "react";
 
-export function Pagination({ currentPage, totalPages, onPageChange }: PaginationProps) {
-  return (
-    <div className="flex items-center gap-2">
-      <button 
-        onClick={() => onPageChange(currentPage - 1)}
-        disabled={currentPage <= 1}
-        className="px-3 py-1 rounded border disabled:opacity-50"
-        aria-label="Previous page"
-      >
-        Previous
-      </button>
-      
-      <span className="mx-2">
-        Page {currentPage} of {totalPages}
-      </span>
-      
-      <button 
-        onClick={() => onPageChange(currentPage + 1)}
-        disabled={currentPage >= totalPages}
-        className="px-3 py-1 rounded border disabled:opacity-50"
-        aria-label="Next page"
-      >
-        Next
-      </button>
-    </div>
-  );
+export type PaginationProps = {
+    pagination: PaginationInfo;
+} & HTMLAttributes<HTMLDivElement>
+
+export function Pagination({ pagination, ...props }: PaginationProps) {
+    return (
+        <div {...props}>
+            <div className="flex items-center gap-2 py-2">
+                <p className="text-gray-600">Page {pagination.currentPage} of {pagination.totalPages}</p>
+                {pagination.pendingPageChange && <LoaderCircle className="w-4 h-4 animate-spin" />}
+            </div>
+            <div className="flex gap-2 w-full">
+                <button
+                    onClick={pagination.handlePreviousPage}
+                    disabled={!pagination.canGoToPreviousPage}
+                    className="button"
+                >
+                    Previous
+                </button>
+                <button
+                    onClick={pagination.handleNextPage}
+                    disabled={!pagination.canGoToNextPage}
+                    className="button"
+                >
+                    Next
+                </button>
+            </div>
+        </div>
+    );
 }

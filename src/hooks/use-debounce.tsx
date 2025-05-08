@@ -5,6 +5,10 @@ export function useDebounce<T>(value: T, delay: number = 500): [T, boolean, (new
   const [debouncedValue, setDebouncedValue] = useState<T>(value);
 
   useEffect(() => {
+    setComparedValue(value);
+  }, [value]);
+
+  useEffect(() => {
     const handler = setTimeout(() => {
       setDebouncedValue(value);
       setComparedValue(value);
@@ -14,7 +18,6 @@ export function useDebounce<T>(value: T, delay: number = 500): [T, boolean, (new
       clearTimeout(handler);
     };
   }, [value, delay]);
-
 
   const same = useMemo(() => {
     return comparedValue === debouncedValue;

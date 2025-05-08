@@ -5,7 +5,7 @@ export function CustomLoader() {
     const { prefersReducedMotion } = useAnimationPrefs();
 
     return (
-        <div className={`text-center py-12 w-full`}>
+        <div className={`flex items-center justify-center py-12 w-full`}>
             {prefersReducedMotion ?
                 <span className="text-2xl font-bold">Loading...</span>
             :

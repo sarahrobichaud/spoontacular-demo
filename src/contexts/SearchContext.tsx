@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useState, useRef } from 'react';
 import { useDebounce } from '../hooks/use-debounce';
-import { usePagination } from '../hooks/use-pagination';
+import { usePagination, type PaginationInfo } from '../hooks/use-pagination';
 import { useLocation, useNavigate } from 'react-router';
 import type { Recipe } from '../services/spoonacular';
 import { LayoutState, useLayout } from './LayoutContext';
@@ -15,22 +15,12 @@ interface SearchContextType {
   data: Recipe[];
   handleSearch: () => void;
   loading: boolean;
-  pagination: {
-    currentPage: number;
-    totalPages: number;
-    pendingPageChange: boolean;
-    handleNextPage: () => void;
-    handlePreviousPage: () => void;
-    canGoToNextPage: boolean;
-    canGoToPreviousPage: boolean;
-    offset: number;
-    totalResults: number;
-    available: boolean;
-  }
+  pagination: PaginationInfo & { available: boolean };
   reset: () => void;
 }
 
 
+const PAGE_SIZE = 5;
 const SearchContext = createContext<SearchContextType | undefined>(undefined);
 
 export function SearchProvider({ children }: { children: React.ReactNode }) {
@@ -42,9 +32,9 @@ export function SearchProvider({ children }: { children: React.ReactNode }) {
     const [autoSearch, setAutoSearch] = useState(false);
     const [data, setData] = useState<Recipe[]>([]);
     const { loading, isInitialSearch,  metadata, searchResults, reset, searchRecipes} = useSpoonSearch();
-    const pagination = usePagination(5, metadata.totalResults);
+    const pagination = usePagination(PAGE_SIZE, metadata.totalResults);
 
-    const showLoader = loading || queryHasChanged || loadingOverride;
+    const showLoader = loading || queryHasChanged || loadingOverride || pagination.pendingPageChange;
 
     const paginationAvailable = metadata.totalResults > 5;
     const isMobile = useIsMobile();
@@ -65,7 +55,7 @@ export function SearchProvider({ children }: { children: React.ReactNode }) {
     // Auto Search
     useEffect(() => {
 
-        if(!autoSearch && isMobile) return;
+        if(!autoSearch || isMobile || location.pathname !== '/') return;
 
         pagination.reset();
         searchRecipes({ query, page: pagination.activePage, pageSize: 5 });
@@ -76,15 +66,21 @@ export function SearchProvider({ children }: { children: React.ReactNode }) {
     // Update the results
     useEffect(() => {
         setData(searchResults);
-        setLoadingOverride(false);
+
+        let timeout = setTimeout(() => {
+            setLoadingOverride(false);
+        }, 200); // safe buffer
+
+        return () => clearTimeout(timeout);
+
     }, [searchResults]);
+
 
 
     // Set the search term from the URL
     useEffect(() => {
         const params = new URLSearchParams(location.search);
         const q = params.get('q');
-        console.log({mounting: isMountingRef.current});
 
         if(isMountingRef.current) {
             isMountingRef.current = false;
@@ -102,19 +98,20 @@ export function SearchProvider({ children }: { children: React.ReactNode }) {
 
     useEffect(() => {
         console.log("active page changed");
-
-        // if(pagination.activePage === pagination.currentPage) return;    
-        
-        searchRecipes({ query, page: pagination.activePage, pageSize: 5 });
-        
+        setLoadingOverride(true);
+        searchRecipes({ query, page: pagination.activePage, pageSize: PAGE_SIZE });
     }, [pagination.activePage]);
 
     const handleSearch = () => {
+        pagination.reset();
         if(isInitialSearch) {
             setLayoutState(LayoutState.HEADER)
             setAutoSearch(true);
         }
-        searchRecipes({ query: searchTerm, page: 1, pageSize: 5 });
+        if(location.pathname !== '/') {
+          navigate(`/?q=${encodeURIComponent(searchTerm)}`, { replace: true });
+        }
+        searchRecipes({ query: searchTerm, page: 1, pageSize: PAGE_SIZE });
     }
 
 
@@ -125,6 +122,8 @@ export function SearchProvider({ children }: { children: React.ReactNode }) {
       query,
       queryHasChanged,
       pagination: {
+        reset: pagination.reset,
+        activePage: pagination.activePage,
         currentPage: pagination.currentPage,
         totalPages: pagination.totalPages,
         pendingPageChange: pagination.pendingPageChange,
