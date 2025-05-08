@@ -9,7 +9,7 @@ import { useSafeAnimations } from "../../hooks/use-safe-animations";
 import { useSearch } from "../../contexts/SearchContext";
 export default function Header() {
 
-    const { searchTerm, setSearchTerm, performSearch } = useSearch();
+    const { searchTerm, setSearchTerm, reset , triggerSearch} = useSearch();
     const { layoutState , isCentered} = useLayout();
 
 
@@ -19,10 +19,11 @@ export default function Header() {
 
     const { getNoMotionOverride } = useSafeAnimations();
 
-    const handleSearch = (e: FormEvent<HTMLFormElement>) => {
+
+    const search = (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        performSearch(searchTerm);
-    };
+        triggerSearch();
+    }
 
     return (
         <>
@@ -70,7 +71,7 @@ export default function Header() {
                             {layoutState === 'header' && (
                                 <motion.form
                                     className="flex-1 max-w-lg mx-4"
-                                    onSubmit={handleSearch}
+                                    onSubmit={search}
                                     initial={ prefersReducedMotion ? {} : { opacity: 0, y: -10 }}
                                     animate={ prefersReducedMotion ? {} : { opacity: 1, y: 0 }}
                                     exit={ prefersReducedMotion ? {} : { opacity: 0 }}

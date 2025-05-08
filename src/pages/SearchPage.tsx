@@ -1,4 +1,4 @@
-import { useEffect, type FormEvent } from "react";
+import { useCallback, useEffect, useMemo, useState, type FormEvent } from "react";
 import { useLocation } from "react-router";
 import { motion, AnimatePresence } from "framer-motion";
 import { useLayout } from "../contexts/LayoutContext";
@@ -27,24 +27,25 @@ const mockRecipes: Recipe[] = [
     { id: 6, title: "Greek Salad", image: mockImg, minutes: 15, healthScore: 95 },
 ];
 
+
 export function SearchSection() {
 
-    const { searchTerm, setSearchTerm, performSearch } = useSearch();
+    const { searchTerm, setSearchTerm, triggerSearch } = useSearch();
     const { prefersReducedMotion } = useAnimationPrefs();
 
     const handleSearch = (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        performSearch(searchTerm);
+        triggerSearch();
     };
 
     return (
         <motion.div
             key="centered"
             className="flex flex-col items-center justify-center min-h-[70vh]"
-            initial={ prefersReducedMotion ? {} : { opacity: 0 }}
-            animate={ prefersReducedMotion ? {} : { opacity: 1, y: 0 }}
-            exit={ prefersReducedMotion ? {} : { opacity: 0, y: -100 }}
-            transition={ prefersReducedMotion ? { duration: 0 } : { duration: 0.3 }}
+            initial={prefersReducedMotion ? {} : { opacity: 0 }}
+            animate={prefersReducedMotion ? {} : { opacity: 1, y: 0 }}
+            exit={prefersReducedMotion ? {} : { opacity: 0, y: -100 }}
+            transition={prefersReducedMotion ? { duration: 0 } : { duration: 0.3 }}
         >
             <div className="text-center mb-8">
                 <h1 className="text-5xl font-bold mb-2">RecipeFinder</h1>
@@ -77,33 +78,30 @@ export function SearchSection() {
 }
 
 export default function SearchPage() {
-    const { isCentered} = useLayout();
-    const { searchTerm, setSearchTerm, isLoading } = useSearch();
+    const { isCentered } = useLayout();
+    const {  searchTerm, setSearchTerm,  isLoading, data, reset} = useSearch();
 
     const location = useLocation();
     const { prefersReducedMotion } = useAnimationPrefs();
 
+
+    // Set the search term from the URL
     useEffect(() => {
         const params = new URLSearchParams(location.search);
         const q = params.get('q');
 
         if (q) {
             setSearchTerm(q);
+        }else if(location.pathname === '/') {
+            reset();
         }
     }, [location, setSearchTerm]);
-
-
-    const filteredRecipes = searchTerm
-        ? mockRecipes.filter(recipe =>
-            recipe.title.toLowerCase().includes(searchTerm.toLowerCase())
-        )
-        : [];
 
     return (
         <div className="w-full">
             <AnimatePresence mode="wait">
                 {isCentered ? (
-                    <SearchSection />
+                    <SearchSection  />
                 ) : (
 
                     isLoading ? (
@@ -116,16 +114,16 @@ export default function SearchPage() {
                         <motion.div
                             key="results"
                             className="w-full"
-                            initial={ prefersReducedMotion ? {} : { opacity: 0, y: 20 }}
-                            animate={ prefersReducedMotion ? {} : { opacity: 1, y: 0 }}
-                            exit={ prefersReducedMotion ? {} : { opacity: 0 }}
-                            transition={ prefersReducedMotion ? { duration: 0 } : { duration: 0.2 }}
+                            initial={prefersReducedMotion ? {} : { opacity: 0, y: 20 }}
+                            animate={prefersReducedMotion ? {} : { opacity: 1, y: 0 }}
+                            exit={prefersReducedMotion ? {} : { opacity: 0 }}
+                            transition={prefersReducedMotion ? { duration: 0 } : { duration: 0.2 }}
                         >
-                            {filteredRecipes.length > 0 ? (
+                            {data && data.results.length > 0 ? (
                                 <div>
                                     <h2 className="text-xl font-semibold mb-4">Search Results</h2>
                                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                                        {filteredRecipes.map(recipe => (
+                                        {data.results.map(recipe => (
                                             <RecipeCard key={recipe.id} recipe={recipe} />
                                         ))}
                                     </div>

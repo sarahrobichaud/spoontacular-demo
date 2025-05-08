@@ -1,5 +1,5 @@
 import { Link } from "react-router";
-import type { Recipe } from "../pages/SearchPage";
+import type { Recipe } from "../services/spoonacular";
 import { motion } from "framer-motion";
 import { useParallax } from "../hooks/use-parallax";
 import { useAnimationPrefs } from "../contexts/AnimationContext";
@@ -41,7 +41,7 @@ export function RecipeCard({ recipe }: RecipeCardProps) {
         <div className="p-4">
           <h3 className="text-lg font-semibold mb-2">{recipe.title}</h3>
           <div className="flex justify-between text-sm text-gray-600">
-            <span>⏱️ {recipe.minutes} mins</span>
+            <span>⏱️ {recipe.readyInMinutes} mins</span>
             <span>❤️ {recipe.healthScore}% Health Score</span>
           </div>
         </div>

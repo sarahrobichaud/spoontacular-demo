@@ -1,0 +1,29 @@
+const BASE_URL = 'https://api.spoonacular.com';
+const API_KEY = import.meta.env.VITE_SPOON_API_KEY;
+
+async function fetchSpoonacular<T>(endpoint: string, params = {}, options: RequestInit = {method: 'GET'}): Promise<T> {
+  const url = new URL(`${BASE_URL}${endpoint}`);
+
+  const headers = {
+    'Content-Type': 'application/json',
+    'x-api-key': API_KEY
+  };
+
+  console.log(headers);
+
+  Object.entries(params).forEach(([key, value]) => {
+    url.searchParams.append(key, String(value));
+  });
+  
+  const response = await fetch(url, { headers, ...options });
+  
+  if (!response.ok) {
+    throw new Error(`API error: ${response.status}`);
+  }
+  
+  return await response.json() as T;
+}
+
+export {
+  fetchSpoonacular
+};

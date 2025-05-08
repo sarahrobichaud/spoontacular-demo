@@ -1,52 +1,83 @@
-import { createContext, useContext, useState, type ReactNode } from 'react';
-import { useNavigate, useLocation } from 'react-router';
-import { useEffect } from 'react';
+import { createContext, useCallback, useContext, useEffect, useState } from 'react';
 import { useDebounce } from '../hooks/use-debounce';
+import { useSpoonSearch } from '../hooks/use-spoon-search';
 import { LayoutState, useLayout } from './LayoutContext';
+import type { RecipeSearchResponse } from '../services/spoonacular';
+import { useIsMobile } from '../hooks/use-mobile';
 
 interface SearchContextType {
   searchTerm: string;
   setSearchTerm: (term: string) => void;
-  performSearch: (term: string) => void;
+  triggerSearch: () => void;
   isLoading: boolean;
+  data: RecipeSearchResponse | null;
+  reset: () => void;
+}
+
+type SearchOptions = {
+  query: string;
+  page: number;
+  pageSize: number;
 }
 
 const SearchContext = createContext<SearchContextType | undefined>(undefined);
 
-export function SearchProvider({ children }: { children: ReactNode }) {
+export function SearchProvider({ children }: { children: React.ReactNode }) {
   const [searchTerm, setSearchTerm] = useState('');
-  const navigate = useNavigate();
-  const location = useLocation();
-  const { setLayoutState, isCentered } = useLayout();
+  const [query, hasPendingChange, overrideDebounce] = useDebounce(searchTerm, 500);
+  const { isCentered , setLayoutState} = useLayout();
 
-  const { debouncedValue: debouncedSearchTerm, isLoading } = useDebounce(searchTerm, 500);
+  const { searchRecipes , isInitialSearch, loading, searchResults, reset} = useSpoonSearch();
 
-  // Handle debounced search
+  const [lastTrigger, setLastTrigger] = useState(0);
+  const isMobile = useIsMobile();
+
+  const searchCallback = useCallback((options: SearchOptions) => {
+      setLastTrigger(Date.now());
+      searchRecipes(options);
+  }, [searchRecipes, setLastTrigger]);
+
+
   useEffect(() => {
-    if (debouncedSearchTerm && searchTerm === debouncedSearchTerm && !isCentered) {
-      performSearch(debouncedSearchTerm);
+    if(lastTrigger > Date.now() - 500) {
+      return;
     }
-  }, [debouncedSearchTerm]);
 
-  // Sync search term with URL
+    if (query.trim() && !hasPendingChange && !isCentered && !isMobile) {
+      searchCallback({ query, page: 1, pageSize: 5 });
+    }
+  }, [query, hasPendingChange, searchRecipes]);
+
+
+  const triggerSearch = () => {
+    overrideDebounce(); 
+    searchCallback({ query, page: 1, pageSize: 5 });
+  }
+
+
   useEffect(() => {
-    const params = new URLSearchParams(location.search);
-    const q = params.get('q');
-
-    if (q) {
-      setSearchTerm(q);
+    if(!isInitialSearch) {
+      setLayoutState(LayoutState.HEADER);
     }
-  }, [location]);
+  }, [isInitialSearch]);
 
-  const performSearch = (term: string) => {
-    if (!term.trim()) return;
-    setSearchTerm(term);
-    setLayoutState(LayoutState.HEADER);
-    navigate(`/?q=${encodeURIComponent(term)}`);
-  };
+
+  const handleReset = () => {
+    reset();
+    setSearchTerm('');
+    overrideDebounce();
+    setLayoutState(LayoutState.CENTERED);
+  }
 
   return (
-    <SearchContext.Provider value={{ searchTerm, setSearchTerm, performSearch, isLoading }}>
+    <SearchContext.Provider value={{ 
+      searchTerm,
+      setSearchTerm, 
+      triggerSearch,
+      isLoading: loading || hasPendingChange,
+      data: searchResults,
+      reset: handleReset
+    }}>
       {children}
     </SearchContext.Provider>
   );
