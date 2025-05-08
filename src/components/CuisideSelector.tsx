@@ -13,6 +13,7 @@ export const CuisineSelector = (props: HTMLAttributes<HTMLDivElement>) => {
 					active: includeAllCuisines,
 					interactive: !includeAllCuisines,
 				})}
+				disabled={includeAllCuisines}
 				onClick={() => toggleCuisine('all')}
 			>
 				All Cuisines

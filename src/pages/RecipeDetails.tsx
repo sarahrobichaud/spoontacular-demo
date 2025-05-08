@@ -13,7 +13,7 @@ export default function RecipeDetails() {
 	const { layoutState, setLayoutState } = useLayout()
 	const { prefersReducedMotion } = useAnimationPrefs()
 	const { recipe, loading, error } = useRecipeDetails(id)
-	const { query, pagination } = useSearch()
+	const { query, pagination, cuisinesStringParam } = useSearch()
 
 	useEffect(() => {
 		if (layoutState === 'centered') {
@@ -63,9 +63,9 @@ export default function RecipeDetails() {
 			exit={prefersReducedMotion ? {} : { opacity: 0 }}
 			transition={prefersReducedMotion ? { duration: 0 } : { duration: 0.3 }}
 		>
-			{query && pagination.totalResults > 1 ? (
+			{query && pagination.totalResults >= 1 ? (
 				<Link
-					to={`/search?q=${query}`}
+					to={`/search?q=${query}&cuisine=${cuisinesStringParam}`}
 					className='button mb-4 inline-block gap-2'
 				>
 					<div className='flex items-center gap-2'>

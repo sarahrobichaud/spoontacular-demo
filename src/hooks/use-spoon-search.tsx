@@ -6,6 +6,8 @@ import {
 import type { Recipe } from '../services/spoonacular'
 import { mockRecipes } from '../data/mockRecipes'
 import { env } from '../env'
+import { useNavigate } from 'react-router'
+import { useLocation } from 'react-router'
 
 const generateMockResponse = async (
 	query: string,
@@ -44,6 +46,8 @@ export function useSpoonSearch() {
 	const [totalResults, setTotalResults] = useState<number | 0>(0)
 	const [offset, setOffset] = useState(0)
 	const [results, setResults] = useState<Recipe[]>([])
+	const navigate = useNavigate()
+	const location = useLocation()
 
 	const reset = () => {
 		setResults([])
@@ -60,6 +64,23 @@ export function useSpoonSearch() {
 	}: { query: string; page: number; pageSize: number; cuisine: string }) => {
 		let resetOffset = false
 		if (!query?.trim() && !cuisine?.trim()) return
+
+		// Update URL to match the search query and cuisine
+
+		// Only update URL if we're on the search page and have a valid query
+		if (location.pathname === '/' && query.trim()) {
+			const searchParams = new URLSearchParams()
+			searchParams.set('q', query)
+
+			if (cuisine) {
+				searchParams.set('cuisine', cuisine)
+			}
+
+			const newUrl = `/?${searchParams.toString()}`
+
+			// Use replace to avoid adding to browser history for every search
+			navigate(newUrl, { replace: true })
+		}
 
 		const currentRequestRef = ++latestRequestRef.current
 

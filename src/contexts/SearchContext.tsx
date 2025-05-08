@@ -13,7 +13,6 @@ import type { Recipe } from '../services/spoonacular'
 import { LayoutState, useLayout } from './LayoutContext'
 import { useSpoonSearch } from '../hooks/use-spoon-search'
 import { useIsMobile } from '../hooks/use-mobile'
-import { AVAILABLE_CUISINES } from '../data/cuisines'
 interface SearchContextType {
 	setSearchTerm: (term: string) => void
 	searchTerm: string
@@ -21,6 +20,8 @@ interface SearchContextType {
 	queryHasChanged: boolean
 	hasCuisine: (cuisine: string) => boolean
 	toggleCuisine: (cuisine: string) => void
+	cuisineHasChanged: boolean
+	cuisinesStringParam: string
 	data: Recipe[]
 	canSearch: boolean
 	handleSearch: () => void
@@ -35,8 +36,13 @@ const SearchContext = createContext<SearchContextType | undefined>(undefined)
 
 export function SearchProvider({ children }: { children: React.ReactNode }) {
 	const [searchTerm, setSearchTerm] = useState('')
-	const [query, queryHasChanged, resetQuery] = useDebounce(searchTerm, 500)
 	const [cuisines, setCuisines] = useState<string[]>([])
+
+	const [cuisineQuery, cuisineQueryHasChanged, resetCuisineQuery] = useDebounce(
+		cuisines,
+		500
+	)
+	const [query, queryHasChanged, resetQuery] = useDebounce(searchTerm, 500)
 
 	const [loadingOverride, setLoadingOverride] = useState(false)
 	const { setLayoutState } = useLayout()
@@ -66,14 +72,15 @@ export function SearchProvider({ children }: { children: React.ReactNode }) {
 	const location = useLocation()
 
 	const cuisineParam = useMemo(() => {
-		const param = cuisines.length > 0 ? cuisines.join(',') : ''
+		const param = cuisineQuery.length > 0 ? cuisineQuery.join(',') : ''
 		return param
-	}, [cuisines])
+	}, [cuisineQuery])
 
 	const resetSearch = () => {
 		setSearchTerm('')
 		setAutoSearch(false)
 		setCuisines([])
+		resetCuisineQuery([])
 		setLayoutState(LayoutState.CENTERED)
 		pagination.reset()
 		reset()
@@ -104,7 +111,7 @@ export function SearchProvider({ children }: { children: React.ReactNode }) {
 			pageSize: 5,
 			cuisine: cuisineParam,
 		})
-	}, [query, autoSearch, cuisineParam])
+	}, [query, autoSearch, cuisineParam, cuisineParam])
 
 	// Update the results
 	useEffect(() => {
@@ -146,11 +153,7 @@ export function SearchProvider({ children }: { children: React.ReactNode }) {
 
 	const toggleCuisine = (cuisine: string) => {
 		if (cuisine === 'all') {
-			if (cuisines.length === AVAILABLE_CUISINES.length) {
-				setCuisines([])
-				return
-			}
-			setCuisines(Object.values(AVAILABLE_CUISINES))
+			setCuisines([])
 		} else {
 			setCuisines(prev => {
 				const exists = prev.includes(cuisine)
@@ -197,10 +200,10 @@ export function SearchProvider({ children }: { children: React.ReactNode }) {
 				query,
 				toggleCuisine,
 				queryHasChanged,
+				cuisinesStringParam: cuisineParam,
 				hasCuisine,
-				includeAllCuisines:
-					cuisines.length === AVAILABLE_CUISINES.length ||
-					cuisines.length === 0,
+				cuisineHasChanged: cuisineQueryHasChanged,
+				includeAllCuisines: cuisines.length === 0,
 				canSearch,
 				pagination: {
 					reset: pagination.reset,

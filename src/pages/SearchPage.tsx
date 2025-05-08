@@ -12,11 +12,12 @@ import { Pagination } from '../components/ui/Pagination'
 import { SearchComponent } from '../components/SearchComponent'
 import { CuisineSelector } from '../components/CuisideSelector'
 import { useIsMobile } from '../hooks/use-mobile'
-import { Filter, X } from 'lucide-react'
+import { Filter, LoaderCircle, X } from 'lucide-react'
 import clsx from 'clsx'
 
 export default function SearchPage() {
-	const { searchTerm, pagination, loading, data, query } = useSearch()
+	const { searchTerm, pagination, loading, data, query, cuisineHasChanged } =
+		useSearch()
 	const [isFilterOpen, setIsFilterOpen] = useState(false)
 
 	const { isCentered } = useLayout()
@@ -86,8 +87,11 @@ export default function SearchPage() {
 									'my-4 p-2 border-y border-gray-300/10': isMobile,
 								})}
 							>
-								<h3 className='my-4 text-lg font-semibold'>
+								<h3 className='my-4 text-lg font-semibold flex items-center gap-2'>
 									Filter by cuisine
+									{cuisineHasChanged && (
+										<LoaderCircle className='w-4 h-4 animate-spin' />
+									)}
 								</h3>
 								{isMobile && (
 									<button
