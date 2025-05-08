@@ -1,7 +1,7 @@
-import { createContext, useContext, useEffect, useState } from 'react';
+import { createContext, useContext, useEffect, useState, useRef } from 'react';
 import { useDebounce } from '../hooks/use-debounce';
 import { usePagination } from '../hooks/use-pagination';
-import { useLocation } from 'react-router';
+import { useLocation, useNavigate } from 'react-router';
 import type { Recipe } from '../services/spoonacular';
 import { LayoutState, useLayout } from './LayoutContext';
 import { useSpoonSearch } from '../hooks/use-spoon-search';
@@ -37,18 +37,20 @@ export function SearchProvider({ children }: { children: React.ReactNode }) {
   const [searchTerm, setSearchTerm] = useState('');
   const [query, queryHasChanged, resetQuery] = useDebounce(searchTerm, 500);
 
-    const {setLayoutState, isCentered} = useLayout();
+    const [loadingOverride, setLoadingOverride] = useState(false);
+    const {setLayoutState} = useLayout();
     const [autoSearch, setAutoSearch] = useState(false);
     const [data, setData] = useState<Recipe[]>([]);
-    const location = useLocation();
     const { loading, isInitialSearch,  metadata, searchResults, reset, searchRecipes} = useSpoonSearch();
     const pagination = usePagination(5, metadata.totalResults);
 
-    const showLoader = loading || queryHasChanged;
-    console.log({loading, queryHasChanged});
+    const showLoader = loading || queryHasChanged || loadingOverride;
 
     const paginationAvailable = metadata.totalResults > 5;
     const isMobile = useIsMobile();
+    const isMountingRef = useRef(true);
+    const navigate = useNavigate();
+    const location = useLocation();
 
     const resetSearch = () => {
         setSearchTerm('');
@@ -74,7 +76,7 @@ export function SearchProvider({ children }: { children: React.ReactNode }) {
     // Update the results
     useEffect(() => {
         setData(searchResults);
-        console.log(searchResults);
+        setLoadingOverride(false);
     }, [searchResults]);
 
 
@@ -82,15 +84,21 @@ export function SearchProvider({ children }: { children: React.ReactNode }) {
     useEffect(() => {
         const params = new URLSearchParams(location.search);
         const q = params.get('q');
+        console.log({mounting: isMountingRef.current});
 
-        if (q) {
-            setLayoutState(LayoutState.HEADER)
-            setSearchTerm(q);
-            setAutoSearch(true);
-        } else if (location.pathname === '/') {
-            reset();
+        if(isMountingRef.current) {
+            isMountingRef.current = false;
+            if (q && q !== searchTerm) {
+                setLoadingOverride(true);
+                setLayoutState(LayoutState.HEADER)
+                setSearchTerm(q);
+                setAutoSearch(true);
+                navigate(`/?q=${encodeURIComponent(q)}`, { replace: true });
+            } 
         }
-    }, [location, setSearchTerm]);
+    }, []);
+
+
 
     useEffect(() => {
         console.log("active page changed");

@@ -1,7 +1,6 @@
-import { use, useCallback, useEffect, useMemo, useState, type FormEvent } from "react";
-import { useLocation } from "react-router";
+import { useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { LayoutState, useLayout } from "../contexts/LayoutContext";
+import {  useLayout } from "../contexts/LayoutContext";
 import RecipeIdeasPrompt from "../components/RecipeIdeaPrompt";
 import { CustomLoader } from "../components/ui/CustomLoader";
 import { RecipeCard } from "../components/RecipeCard";
@@ -9,9 +8,6 @@ import { useAnimationPrefs } from "../contexts/AnimationContext";
 import { useSearch } from "../contexts/SearchContext";
 
 import type { Recipe } from "../services/spoonacular";
-import { useSpoonSearch } from "../hooks/use-spoon-search";
-import { usePagination } from "../hooks/use-pagination";
-import { i } from "framer-motion/client";
 import { LoaderCircle } from "lucide-react";
 
 
@@ -62,9 +58,9 @@ export function SearchSection({ handleSearch }: { handleSearch: () => void }) {
 }
 
 export default function SearchPage() {
-    const { searchTerm, setSearchTerm, queryHasChanged, query, pagination, handleSearch, loading, data, reset } = useSearch();
+    const { searchTerm, pagination, handleSearch, loading, data, } = useSearch();
 
-    const { layoutState, isCentered } = useLayout();
+    const { isCentered } = useLayout();
 
     useEffect(() => {
     // Scroll to top when page changes
@@ -76,7 +72,6 @@ export default function SearchPage() {
 
     const { prefersReducedMotion } = useAnimationPrefs();
 
-    console.log({pagination})
 
     return (
         <div className="w-full min-h-screen">
@@ -99,8 +94,8 @@ export default function SearchPage() {
                     </div>
                     {pagination.available && !isCentered && searchTerm !== '' && (
                         <div className="sticky top-[2rem] w-full h-full">
-                            <h2 className="text-xl font-semibold mb-2">Results</h2>
-                            <div className="flex items-center gap-2">
+                            <h2 className="text-xl font-semibold mb-2">{pagination.totalResults} Results</h2>
+                            <div className="flex items-center gap-2 py-2">
                                 <p className="text-gray-600">Page {pagination.currentPage} of {pagination.totalPages}</p>
                                 {pagination.pendingPageChange && <LoaderCircle className="w-4 h-4 animate-spin" />}
                             </div>
@@ -108,14 +103,14 @@ export default function SearchPage() {
                                 <button
                                     onClick={pagination.handlePreviousPage}
                                     disabled={!pagination.canGoToPreviousPage}
-                                    className="w-full hover:cursor-pointer bg-gray-500/20 backdrop-blur-sm text-gray-700 dark:text-gray-200 px-4 py-2 rounded-lg border border-gray-300/30 shadow-sm hover:bg-gray-500/30 focus:outline-none focus:ring-2 focus:ring-gray-400/50 focus:border-transparent transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-gray-500/20"
+                                    className="button"
                                 >
                                     Previous
                                 </button>
                                 <button
                                     onClick={pagination.handleNextPage}
                                     disabled={!pagination.canGoToNextPage}
-                                    className="w-full hover:cursor-pointer bg-gray-500/20 backdrop-blur-sm text-gray-700 dark:text-gray-200 px-4 py-2 rounded-lg border border-gray-300/30 shadow-sm hover:bg-gray-500/30 focus:outline-none focus:ring-2 focus:ring-gray-400/50 focus:border-transparent transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-gray-500/20"
+                                    className="button"
                                 >
                                     Next
                                 </button>

@@ -6,6 +6,7 @@ import type { FormEvent } from "react";
 import { useAnimationPrefs } from "../../contexts/AnimationContext";
 import { useSafeAnimations } from "../../hooks/use-safe-animations";
 import { useSearch } from "../../contexts/SearchContext";
+import { useLocation } from "react-router";
 export default function Header() {
 
     const { searchTerm, setSearchTerm, handleSearch } = useSearch();
@@ -18,6 +19,8 @@ export default function Header() {
 
     const { getNoMotionOverride } = useSafeAnimations();
 
+    const pathname = useLocation().pathname;
+
 
     const search = (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -26,7 +29,7 @@ export default function Header() {
 
     return (
         <>
-            {isMobile && layoutState !== LayoutState.CENTERED &&
+            {isMobile && layoutState !== LayoutState.CENTERED && pathname === '/' &&
                 <div
                     className="fixed bottom-0 left-0 right-0 container mx-auto px-4 bg-black/100 py-4 border-t-2 border-gray-300/10 min-h-[100px]"
                     style={!prefersReducedMotion ? {
@@ -65,7 +68,7 @@ export default function Header() {
                         <img src="/logo.svg" alt="RecipeFinder Logo" className={`w-10 h-10 logo ${getNoMotionOverride()}`} />
                         <span className="text-2xl font-bold">RecipeFinder</span>
                     </a>
-                    {!isMobile &&
+                    {!isMobile && pathname === '/' &&
                         <AnimatePresence>
                             {layoutState === 'header' && (
                                 <motion.form

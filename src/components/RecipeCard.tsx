@@ -36,14 +36,23 @@ export function RecipeCard({ recipe, ...props }: RecipeCardProps) {
     >
       <Link 
         to={`/recipe/${recipe.id}`} 
-        className="block"
+        className="block p-4"
       >
-        <img src={recipe.image} alt={recipe.title} className="w-full h-48 object-cover" />
-        <div className="p-4">
-          <h3 className="text-lg font-semibold mb-2">{recipe.title}</h3>
-          <div className="flex justify-between text-sm text-gray-600">
-            <span>⏱️ {recipe.readyInMinutes} mins</span>
-            <span>❤️ {recipe.healthScore}% Health Score</span>
+        <div className="flex items-start gap-4">
+          <div className="flex-shrink-0">
+            <img 
+              src={recipe.image} 
+              alt={recipe.title} 
+              className="w-24 h-24 object-cover rounded-md" 
+              loading="lazy"
+            />
+          </div>
+          <div className="flex-grow">
+            <h3 className="text-lg font-semibold mb-2">{recipe.title}</h3>
+            <div className="flex flex-col gap-1 text-sm text-gray-600">
+              <span>⏱️ {recipe.readyInMinutes} mins</span>
+              <span>❤️ {recipe.healthScore}% Health Score</span>
+            </div>
           </div>
         </div>
       </Link>

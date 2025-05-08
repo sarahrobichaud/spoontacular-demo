@@ -2,7 +2,7 @@ import { useState, } from 'react';
 import { complexSearch, type RecipeSearchResponse } from '../services/spoonacular';
 import type { Recipe } from '../services/spoonacular';
 import { mockRecipes } from '../data/mockRecipes';
-import { useLocation, useNavigate } from 'react-router';
+import { data, useLocation, useNavigate } from 'react-router';
 
 
 const generateMockResponse = async (query: string, offset: number, number: number): Promise<RecipeSearchResponse> => {
@@ -38,9 +38,6 @@ export function useSpoonSearch() {
   const [offset, setOffset] = useState(0);
   const [results, setResults] = useState<Recipe[]>([]);
 
-  const navigate = useNavigate();
-
-  const pathname = useLocation().pathname;
 
   const reset = () => {
     setResults([]);
@@ -54,12 +51,6 @@ export function useSpoonSearch() {
     page = 1, 
     pageSize = 10,
   }: {query: string, page: number, pageSize: number, [key: string]: any}) => {
-
-    if(pathname !== '/') {
-        const searchParams = new URLSearchParams();
-        searchParams.set('q', query);
-        navigate(`/?${searchParams.toString()}`);
-    }
 
     let resetOffset = false;
     if (!query?.trim()) return;
@@ -81,15 +72,15 @@ export function useSpoonSearch() {
         offset = 0;
       }
       
-      const data = await complexSearch({ 
-        query,
-        offset,
-        number: pageSize,
-      });
+    //   const data = await complexSearch({ 
+    //     query,
+    //     offset,
+    //     number: pageSize,
+    //   });
 
 
 
-      const { results, ...newMetadata } = data;
+      const { results, ...newMetadata } = await generateMockResponse(query, offset, pageSize);
       
       setResults(results);
       setTotalResults(newMetadata.totalResults);

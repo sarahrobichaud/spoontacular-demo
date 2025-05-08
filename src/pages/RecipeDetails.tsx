@@ -5,6 +5,7 @@ import { useLayout } from "../contexts/LayoutContext";
 import { useAnimationPrefs } from "../contexts/AnimationContext";
 import { useRecipeDetails } from "../hooks/use-recipe-details";
 import { CustomLoader } from "../components/ui/CustomLoader";
+import { useSearch } from "../contexts/SearchContext";
 
 export default function RecipeDetails() {
   const { id } = useParams();
@@ -22,6 +23,7 @@ export default function RecipeDetails() {
       behavior: prefersReducedMotion ? 'auto' : 'smooth'
     });
   }, [layoutState, setLayoutState, prefersReducedMotion]);
+
 
   if (loading) {
     return <CustomLoader />;
@@ -48,15 +50,16 @@ export default function RecipeDetails() {
     ].filter(Boolean)
   ];
 
+  const {query} = useSearch();
+
   return (
     <motion.div
       initial={prefersReducedMotion ? {} : { opacity: 0 }}
       animate={prefersReducedMotion ? {} : { opacity: 1 }}
       exit={prefersReducedMotion ? {} : { opacity: 0 }}
       transition={prefersReducedMotion ? { duration: 0 } : { duration: 0.3 }}
-      className="max-w-4xl mx-auto"
     >
-      <Link to="/" className="text-blue-500 hover:underline inline-flex items-center mb-6">
+      <Link to={query ? `/search?q=${query}` : '/'} className="text-blue-500 hover:underline inline-flex items-center mb-6">
         <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
           <path fillRule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clipRule="evenodd" />
         </svg>
@@ -93,6 +96,8 @@ export default function RecipeDetails() {
               <h2 className="text-xl font-semibold mb-2">Health Information</h2>
               <div className="flex flex-wrap gap-2">
                 {healthLabels.map((label, index) => {
+                  if (!label) return null;
+
                   const capitalizedLabel = label
                     .split(' ')
                     .map(word => word.charAt(0).toUpperCase() + word.slice(1))
@@ -112,15 +117,12 @@ export default function RecipeDetails() {
 
           <div className="mb-8">
             <h2 className="text-xl font-semibold mb-2">Summary</h2>
-            <div
-              className="text-gray-700"
-              dangerouslySetInnerHTML={{ __html: recipe.summary }}
-            />
+              <p className="text-gray-400">{recipe.summary}</p>
           </div>
 
           <div className="mb-8">
             <h2 className="text-xl font-semibold mb-4">Ingredients</h2>
-            <div className="bg-gray-50 dark:bg-gray-800/30 p-4 rounded-lg">
+            <div className="bg-gray-700/50 p-4 rounded-lg">
               <ul className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 {recipe.extendedIngredients.map((ingredient) => {
 
@@ -129,16 +131,20 @@ export default function RecipeDetails() {
                     .map(word => word.charAt(0).toUpperCase() + word.slice(1))
                     .join(' ');
 
+
                   return (
                   <li key={ingredient.id} className="flex items-start">
                     <img
                       src={`https://spoonacular.com/cdn/ingredients_100x100/${ingredient.image}`}
                       alt={capitalizedName}
                       className="w-10 h-10 object-cover rounded mr-3 mt-1"
+                      onError={(e) => {
+                        e.currentTarget.src = `http://placehold.co/100x100`;
+                      }}
                     />
                     <div>
                       <span className="font-medium">{capitalizedName}</span>
-                      <span className="text-gray-600 block">
+                      <span className="text-gray-400 block">
                         {ingredient.amount} {ingredient.unit}
                       </span>
                     </div>
@@ -164,13 +170,13 @@ export default function RecipeDetails() {
                         return (
                           <li key={step.number} className="ml-6 list-decimal">
                             <div className="font-medium mb-1">Step {step.number}</div>
-                            <p className="text-gray-700">{step.step}</p>
+                            <p className="text-gray-400">{step.step}</p>
 
                             {(step.ingredients.length > 0 || step.equipment.length > 0) && (
                               <div className="mt-2 flex flex-wrap gap-4">
                                 {step.ingredients.length > 0 && (
                                   <div className="flex items-center">
-                                    <span className="text-sm text-gray-500 mr-2">Ingredients:</span>
+                                    <span className="text-sm text-gray-600 mr-2">Ingredients:</span>
                                     <div className="flex flex-wrap gap-1">
                                       {step.ingredients.map((ing, i) => (
                                         <span key={i} className="text-sm bg-blue-50 text-blue-700 px-2 py-0.5 rounded">
@@ -183,7 +189,7 @@ export default function RecipeDetails() {
 
                                 {step.equipment.length > 0 && (
                                   <div className="flex items-center">
-                                    <span className="text-sm text-gray-500 mr-2">Equipment:</span>
+                                    <span className="text-sm text-gray-600 mr-2">Equipment:</span>
                                     <div className="flex flex-wrap gap-1">
                                       {step.equipment.map((eq, i) => (
                                         <span key={i} className="text-sm bg-gray-50 text-gray-700 px-2 py-0.5 rounded">

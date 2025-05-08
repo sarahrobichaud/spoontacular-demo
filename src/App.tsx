@@ -9,22 +9,29 @@ import './styles/tailwind.css'
 import { AppProvider } from './contexts/AppProvider'
 
 
-const flow = <AppProvider><DefaultLayout><Outlet /></DefaultLayout></AppProvider>;
-
+const defaultElement = <AppProvider><DefaultLayout><Outlet /></DefaultLayout></AppProvider>;
+const errorElement = <AppProvider><DefaultLayout><ErrorPage /></DefaultLayout></AppProvider>;
 const router = createBrowserRouter([
   {
+    path: "/recipe/:id",
+    element: defaultElement,
+    errorElement: errorElement,
+    children: [
+      {
+        index: true,
+        element: <RecipeDetails />
+      },
+    ]
+  },
+  {
     path: "/",
-    element: flow,
-    errorElement: <ErrorPage />,
+    element: defaultElement,
+    errorElement: errorElement,
     children: [
       {
         index: true,
         element: <SearchPage />
       },
-      {
-        path: "recipe/:id",
-        element: <RecipeDetails />
-      }
     ]
   }
 ]);
