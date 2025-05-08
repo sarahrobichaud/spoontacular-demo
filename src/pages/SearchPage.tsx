@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useLayout } from "../contexts/LayoutContext";
 import RecipeIdeasPrompt from "../components/RecipeIdeaPrompt";
@@ -10,12 +10,16 @@ import { useSearch } from "../contexts/SearchContext";
 import type { Recipe } from "../services/spoonacular";
 import { Pagination } from "../components/ui/Pagination";
 import { SearchComponent } from "../components/SearchComponent";
-
+import { CuisineSelector } from "../components/CuisideSelector";
+import { useIsMobile } from "../hooks/use-mobile";
+import { Filter, X } from "lucide-react";
+import clsx from "clsx";
 
 
 
 export default function SearchPage() {
-    const { searchTerm, pagination, loading, data, } = useSearch();
+    const { searchTerm, pagination, loading, data, query } = useSearch();
+    const [isFilterOpen, setIsFilterOpen] = useState(false);
 
     const { isCentered } = useLayout();
 
@@ -29,12 +33,16 @@ export default function SearchPage() {
 
     const { prefersReducedMotion } = useAnimationPrefs();
 
+    const isMobile = useIsMobile();
+
 
     return (
         <div className="w-full min-h-screen">
             <AnimatePresence mode="wait">
-                <div className={`grid grid-cols-1 ${isCentered || searchTerm === '' || data.length === 0 ? 'lg:grid-cols-[1fr]' : 'lg:grid-cols-[3fr_1fr] gap-16'}`}>
-                    <div>
+                <div className={clsx(`grid grid-cols-1 gap-16`, {
+                    'lg:grid-cols-[3fr_1fr]': !isCentered
+                })}>
+                    <div className="order-2 lg:order-1">
                         {isCentered && <SearchComponent />}
                         {!isCentered && !loading && searchTerm === '' && <RecipeIdeasPrompt />}
                         {!isCentered && searchTerm !== '' &&
@@ -49,18 +57,31 @@ export default function SearchPage() {
                                 <SearchResults data={data} isLoading={loading} />
                             </motion.div>}
                     </div>
-                    {data.length > 0 && !isCentered && searchTerm !== '' && (
+                    {!isCentered && (
                         //here
-                        <div className="sticky top-24 h-fit self-start">
-                            <div className="mb-4">
-                                <h3 className="text-lg font-semibold">{pagination.totalResults} {pagination.totalResults === 1 ? 'recipe' : 'recipes'} found</h3>
-                            </div>
+                        <div className="order-1 lg:order-2">
+                            {data.length > 0 && (
+                                <>
+                                    <h3 className="mb-4 text-lg  font-semibold">{pagination.totalResults} {pagination.totalResults === 1 ? 'recipe' : 'recipes'} found</h3>
+                                    {pagination.available &&
+                                        <Pagination
+                                            pagination={pagination}
+                                            className="w-full"
+                                        />
+                                    }
+                                </>
+                            )}
 
-                            {pagination.available &&
-                                <Pagination
-                                    pagination={pagination}
-                                    className="w-full"
-                                />
+                            <div className="flex justify-between gap-2 w-full">
+                                <h3 className="my-4 text-lg font-semibold">Filter by cuisine</h3>
+                                {isMobile &&
+                                    <button onClick={() => setIsFilterOpen(prev => !prev)} className="button">
+                                        {isFilterOpen ? <X className="w-4 h-4" /> : <Filter className="w-4 h-4" />}
+                                    </button>
+                                }
+                            </div>
+                            {isMobile && isFilterOpen || (!isMobile) &&
+                                <CuisineSelector className="flex gap-2 flex-wrap w-full" />
                             }
                         </div>
                     )}
@@ -74,9 +95,12 @@ function SearchResults({ data, isLoading }: { data: Recipe[], isLoading: boolean
 
     if (data.length === 0 && !isLoading) {
         return (
-            <div className="text-center py-12">
-                <h2 className="text-xl font-semibold mb-2">No recipes found</h2>
-                <p className="text-gray-600">Try a different search term</p>
+            <div className="w-full">
+                <h2 className="text-xl font-semibold mb-4">Search Results</h2>
+                <div className="my-2 text-center">
+                    <h2 className="text-xl font-semibold mb-2">No recipes found</h2>
+                    <p className="text-gray-600">Try a different search term</p>
+                </div>
             </div>
         )
     } else {

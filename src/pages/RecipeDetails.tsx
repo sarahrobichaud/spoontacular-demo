@@ -9,10 +9,11 @@ import { useSearch } from "../contexts/SearchContext";
 
 export default function RecipeDetails() {
   const { id } = useParams();
+
   const { layoutState, setLayoutState } = useLayout();
   const { prefersReducedMotion } = useAnimationPrefs();
   const { recipe, loading, error } = useRecipeDetails(id);
-  const {query} = useSearch();
+  const {query, pagination} = useSearch();
 
   useEffect(() => {
     if (layoutState === 'centered') {
@@ -59,12 +60,26 @@ export default function RecipeDetails() {
       exit={prefersReducedMotion ? {} : { opacity: 0 }}
       transition={prefersReducedMotion ? { duration: 0 } : { duration: 0.3 }}
     >
-      <Link to={query ? `/search?q=${query}` : '/'} className="button flex items-center gap-2">
+
+      {query && pagination.totalResults > 1 ? (
+        <Link to={`/search?q=${query}`} className="button mb-4 inline-block gap-2">
+          <div className="flex items-center gap-2">
         <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
           <path fillRule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clipRule="evenodd" />
         </svg>
-        <span>Back to search</span>
-      </Link>
+            <span>Back to {pagination.totalResults} results</span>
+          </div>
+        </Link>
+      ): (
+        <a href="/" className="button mb-4 inline-block gap-2">
+          <div className="flex items-center gap-2">
+        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
+          <path fillRule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clipRule="evenodd" />
+        </svg>
+            <span>Back to search</span>
+          </div>
+        </a>
+      )}
 
       <div className="bg-black/10 border-2 border-gray-300/10 rounded-lg shadow-lg overflow-hidden">
         <div className="relative">

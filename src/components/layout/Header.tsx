@@ -1,4 +1,4 @@
-import { AnimatePresence, motion} from "framer-motion"
+import { AnimatePresence, motion } from "framer-motion"
 import { useLayout } from "../../contexts/LayoutContext";
 import { LayoutState } from "../../contexts/LayoutContext";
 import { useIsMobile } from "../../hooks/use-mobile";
@@ -6,10 +6,11 @@ import type { FormEvent } from "react";
 import { useAnimationPrefs } from "../../contexts/AnimationContext";
 import { useSafeAnimations } from "../../hooks/use-safe-animations";
 import { useSearch } from "../../contexts/SearchContext";
+import { SearchInput } from "../ui/SearchInput";
 export default function Header() {
 
-    const { searchTerm, setSearchTerm, handleSearch } = useSearch();
-    const { layoutState , isCentered} = useLayout();
+    const { searchTerm, setSearchTerm, handleSearch, canSearch } = useSearch();
+    const { layoutState, isCentered } = useLayout();
 
 
     const isMobile = useIsMobile();
@@ -36,25 +37,15 @@ export default function Header() {
                         opacity: 1
                     }}
                 >
-                    <form onSubmit={search} className="w-full flex justify-between items-center">
-                        <input
-                            type="search"
-                            className="w-full px-4 py-2 rounded-md border text-[24px] border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-black/100"
-                            placeholder="Search recipes..."
-                            value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
-                            aria-label="Search recipes"
+                    <div className="max-w-[80%]">
+                        <SearchInput
+                            className="text-4xl"
+                            searchTerm={searchTerm}
+                            setSearchTerm={setSearchTerm}
+                            canSearch={canSearch}
+                            onSubmit={search}
                         />
-                        <button
-                            type="submit"
-                            className="w-20 px-4"
-                            aria-label="Submit search"
-                        >
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                            </svg>
-                        </button>
-                    </form>
+                    </div>
                 </div>
             }
 
@@ -67,41 +58,31 @@ export default function Header() {
                     {!isMobile &&
                         <AnimatePresence>
                             {layoutState === 'header' && (
-                                <motion.form
+                                <motion.div
                                     className="flex-1 max-w-lg mx-4"
-                                    onSubmit={search}
-                                    initial={ prefersReducedMotion ? {} : { opacity: 0, y: -10 }}
-                                    animate={ prefersReducedMotion ? {} : { opacity: 1, y: 0 }}
-                                    exit={ prefersReducedMotion ? {} : { opacity: 0 }}
-                                    transition={ prefersReducedMotion ? { duration: 0 } : { duration: 0.3 }}
+                                    initial={prefersReducedMotion ? {} : { opacity: 0, y: -10 }}
+                                    animate={prefersReducedMotion ? {} : { opacity: 1, y: 0 }}
+                                    exit={prefersReducedMotion ? {} : { opacity: 0 }}
+                                    transition={prefersReducedMotion ? { duration: 0 } : { duration: 0.3 }}
                                 >
-                                    <div className="relative interactable">
-                                        <input
-                                            type="search"
-                                            className="w-full px-4 py-2 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-black/50"
-                                            placeholder="Search recipes..."
-                                            value={searchTerm}
-                                            onChange={(e) => setSearchTerm(e.target.value)}
-                                            aria-label="Search recipes"
+                                    <div className="max-w-[100%]">
+                                        <SearchInput
+                                            className="text-[16px]"
+                                            searchTerm={searchTerm}
+                                            setSearchTerm={setSearchTerm}
+                                            canSearch={canSearch}
+                                            onSubmit={search}
                                         />
-                                        <button
-                                            type="submit"
-                                            className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-blue-500 text-white p-1 rounded-full"
-                                            aria-label="Submit search"
-                                        >
-                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                                            </svg>
-                                        </button>
                                     </div>
-                                </motion.form>
+                                </motion.div>
+
                             )}
                         </AnimatePresence>
                     }
                     <nav >
                         <ul className="flex items-center gap-4">
                             <li>
-                                  <button 
+                                <button
                                     className={`text-white hover:text-blue-300 interactable ${prefersReducedMotion ? 'text-blue-300' : ''}`}
                                     onClick={toggleReducedMotion}
                                     aria-pressed={prefersReducedMotion}

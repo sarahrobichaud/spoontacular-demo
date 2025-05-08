@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState, useRef } from 'react';
+import { createContext, useContext, useEffect, useState, useRef, useMemo } from 'react';
 import { useDebounce } from '../hooks/use-debounce';
 import { usePagination, type PaginationInfo } from '../hooks/use-pagination';
 import { useLocation, useNavigate } from 'react-router';
@@ -12,10 +12,14 @@ interface SearchContextType {
   searchTerm: string;
   query: string;
   queryHasChanged: boolean;
+  hasCuisine: (cuisine: string) => boolean;
+  toggleCuisine: (cuisine: string) => void;
   data: Recipe[];
+  canSearch: boolean;
   handleSearch: () => void;
   loading: boolean;
   pagination: PaginationInfo & { available: boolean };
+  includeAllCuisines: boolean;
   reset: () => void;
 }
 
@@ -26,6 +30,7 @@ const SearchContext = createContext<SearchContextType | undefined>(undefined);
 export function SearchProvider({ children }: { children: React.ReactNode }) {
   const [searchTerm, setSearchTerm] = useState('');
   const [query, queryHasChanged, resetQuery] = useDebounce(searchTerm, 500);
+  const [cuisines, setCuisines] = useState<string[]>([]);
 
     const [loadingOverride, setLoadingOverride] = useState(false);
     const {setLayoutState} = useLayout();
@@ -42,15 +47,23 @@ export function SearchProvider({ children }: { children: React.ReactNode }) {
     const navigate = useNavigate();
     const location = useLocation();
 
+    const cuisineParam = useMemo(() => {
+        return cuisines.length > 0 ? cuisines.join(',') : '';
+    }, [cuisines]);
+
     const resetSearch = () => {
         setSearchTerm('');
         setAutoSearch(false);
+        setCuisines([]);
         setLayoutState(LayoutState.CENTERED);
         pagination.reset();
         reset();
         setData([]);
         resetQuery('');
     }
+    const canSearch = useMemo(() => {
+        return searchTerm.trim() !== '';
+    }, [searchTerm]);
 
     // Auto Search
     useEffect(() => {
@@ -58,9 +71,11 @@ export function SearchProvider({ children }: { children: React.ReactNode }) {
         if(!autoSearch || isMobile || location.pathname !== '/' || loading) return;
 
         pagination.reset();
-        searchRecipes({ query, page: pagination.activePage, pageSize: 5 });
 
-    }, [query, autoSearch]);
+        console.log("autoSearch", query);
+        searchRecipes({ query, page: pagination.activePage, pageSize: 5, cuisine: cuisineParam });
+
+    }, [query, autoSearch, cuisineParam]);
 
 
     // Update the results
@@ -69,29 +84,50 @@ export function SearchProvider({ children }: { children: React.ReactNode }) {
         setLoadingOverride(false);
     }, [searchResults]);
 
+    const hasCuisine = (cuisine: string) => {
+        return cuisines.includes(cuisine);
+    }
 
 
     // Set the search term from the URL
     useEffect(() => {
         const params = new URLSearchParams(location.search);
         const q = params.get('q');
-
+        const c = params.get('cuisine');
         if(isMountingRef.current) {
             isMountingRef.current = false;
             if (q && q !== searchTerm) {
                 setLoadingOverride(true);
                 setLayoutState(LayoutState.HEADER)
                 setSearchTerm(q);
+                if(c) {
+                  const cuisineArray = c.split(',').map(item => item.trim().toLowerCase());
+                  setCuisines(cuisineArray);
+                }
                 setAutoSearch(true);
-                navigate(`/?q=${encodeURIComponent(q)}`, { replace: true });
+                navigate(`/?q=${encodeURIComponent(q)}&cuisine=${encodeURIComponent(c || '')}`, { replace: true });
             } 
         }
     }, []);
 
+    const toggleCuisine = (cuisine: string) => {
+      if(cuisine === 'all') {
+        setCuisines([]);
+        return;
+      }
+      setCuisines(prev => {
+        const exists = prev.includes(cuisine);
+        if (exists) {
+          return prev.filter(c => c !== cuisine);
+        } else {
+          return [...prev, cuisine];
+        }
+      });
+    };
 
 
     useEffect(() => {
-        searchRecipes({ query, page: pagination.activePage, pageSize: PAGE_SIZE });
+        searchRecipes({ query, page: pagination.activePage, pageSize: PAGE_SIZE, cuisine: cuisineParam });
     }, [pagination.activePage]);
 
     const handleSearch = () => {
@@ -99,7 +135,9 @@ export function SearchProvider({ children }: { children: React.ReactNode }) {
         if(location.pathname !== '/') {
           navigate(`/?q=${encodeURIComponent(searchTerm)}`, { replace: true });
         }
-        searchRecipes({ query: searchTerm, page: 1, pageSize: PAGE_SIZE });
+
+        console.log("handleSearch", searchTerm);
+        searchRecipes({ query: searchTerm, page: 1, pageSize: PAGE_SIZE, cuisine: cuisineParam });
         if(isInitialSearch) {
             setLayoutState(LayoutState.HEADER)
             setAutoSearch(true);
@@ -112,7 +150,11 @@ export function SearchProvider({ children }: { children: React.ReactNode }) {
       searchTerm,
       setSearchTerm,
       query,
+      toggleCuisine,
       queryHasChanged,
+      hasCuisine,
+      includeAllCuisines: cuisines.length === 0,
+      canSearch,
       pagination: {
         reset: pagination.reset,
         activePage: pagination.activePage,

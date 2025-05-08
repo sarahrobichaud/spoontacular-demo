@@ -36,6 +36,7 @@ export function useSpoonSearch() {
   const [error, setError] = useState<string | null>(null);
   const [isInitialSearch, setIsInitialSearch] = useState(true);
   const [lastQuery, setLastQuery] = useState('');
+  const [lastCuisine, setLastCuisine] = useState('');
 
   const [totalResults, setTotalResults] = useState<number | 0>(0);
   const [offset, setOffset] = useState(0);
@@ -53,16 +54,17 @@ export function useSpoonSearch() {
     query, 
     page = 1, 
     pageSize = 10,
-  }: {query: string, page: number, pageSize: number, [key: string]: any}) => {
+    cuisine = ''
+  }: {query: string, page: number, pageSize: number, cuisine: string}) => {
 
     let resetOffset = false;
-    if (!query?.trim()) return;
+    if (!query?.trim() && !cuisine?.trim()) return;
 
     const currentRequestRef = ++latestRequestRef.current;
     
     setLoading(true);
 
-    if(query !== lastQuery) {
+    if(query !== lastQuery || cuisine !== lastCuisine) {
       resetOffset = true;
     }
 
@@ -80,6 +82,7 @@ export function useSpoonSearch() {
           offset,
           number: pageSize,
           addRecipeInformation: true,
+          cuisine
         });
       } else {
         data = await generateMockResponse(query, offset, pageSize);
@@ -96,6 +99,7 @@ export function useSpoonSearch() {
       setOffset(newMetadata.offset);
       setIsInitialSearch(false);
       setLastQuery(query);
+      setLastCuisine(cuisine);
 
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An unknown error occurred');
