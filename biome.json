@@ -1,0 +1,63 @@
+{
+	"$schema": "https://biomejs.dev/schemas/1.9.4/schema.json",
+	"vcs": {
+		"enabled": false,
+		"clientKind": "git",
+		"useIgnoreFile": true
+	},
+	"files": {
+		"ignoreUnknown": false,
+		"ignore": ["node_modules", "dist", "build", "public"],
+		"include": ["**/*.ts", "**/*.tsx", "**/*.js", "**/*.jsx", "**/*.json"]
+	},
+	"formatter": {
+		"useEditorconfig": false,
+		"enabled": true,
+		"lineWidth": 80,
+		"indentStyle": "tab",
+		"ignore": ["node_modules", "supabase", ".react-router", ".next"],
+		"include": [
+			"**/*.ts",
+			"**/*.tsx",
+			"**/*.js",
+			"**/*.jsx",
+			"**/*.json",
+			"apps/api/**/*.ts",
+			"apps/api/**/*.tsx"
+		]
+	},
+	"organizeImports": {
+		"enabled": true
+	},
+	"linter": {
+		"ignore": ["node_modules", "dist", "build", "public"],
+		"include": ["**/*.ts", "**/*.tsx", "**/*.js", "**/*.jsx", "**/*.json"],
+		"enabled": true,
+		"rules": {
+			"recommended": true,
+			"a11y": {
+				"useKeyWithClickEvents": "off"
+			},
+			"correctness": {
+				"noUnusedVariables": "error",
+				"noUnusedImports": "error",
+				"useExhaustiveDependencies": "off"
+			}
+		}
+	},
+	"javascript": {
+		"formatter": {
+			"enabled": true,
+			"quoteStyle": "single",
+			"arrowParentheses": "asNeeded",
+			"trailingCommas": "es5",
+			"bracketSpacing": true,
+			"lineWidth": 80,
+			"semicolons": "asNeeded",
+			"jsxQuoteStyle": "single",
+			"attributePosition": "multiline",
+			"quoteProperties": "asNeeded",
+			"bracketSameLine": false
+		}
+	}
+}
