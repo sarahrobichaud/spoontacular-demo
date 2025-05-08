@@ -1,4 +1,4 @@
-import { useState, } from 'react';
+import { useRef, useState, } from 'react';
 import { complexSearch, type RecipeSearchResponse } from '../services/spoonacular';
 import type { Recipe } from '../services/spoonacular';
 import { mockRecipes } from '../data/mockRecipes';
@@ -31,6 +31,8 @@ const generateMockResponse = async (query: string, offset: number, number: numbe
 
 export function useSpoonSearch() {
   const [loading, setLoading] = useState(false);
+  const latestRequestRef = useRef(0);
+
   const [error, setError] = useState<string | null>(null);
   const [isInitialSearch, setIsInitialSearch] = useState(true);
   const [lastQuery, setLastQuery] = useState('');
@@ -55,6 +57,8 @@ export function useSpoonSearch() {
 
     let resetOffset = false;
     if (!query?.trim()) return;
+
+    const currentRequestRef = ++latestRequestRef.current;
     
     setLoading(true);
 
@@ -75,13 +79,18 @@ export function useSpoonSearch() {
           query,
           offset,
           number: pageSize,
+          addRecipeInformation: true,
         });
       } else {
         data = await generateMockResponse(query, offset, pageSize);
       }
 
+      if(currentRequestRef !== latestRequestRef.current) {
+        return; // discard old requests
+      }
+
       const { results, ...newMetadata } = data;
-      
+
       setResults(results);
       setTotalResults(newMetadata.totalResults);
       setOffset(newMetadata.offset);

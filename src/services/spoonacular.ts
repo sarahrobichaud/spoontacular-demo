@@ -63,6 +63,7 @@ export interface RecipeSearchParams {
   excludeIngredients?: string;
   type?: string;
   maxReadyTime?: number;
+  addRecipeInformation?: boolean
   sort?: string;
   sortDirection?: 'asc' | 'desc';
   offset?: number;

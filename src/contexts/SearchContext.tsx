@@ -55,7 +55,7 @@ export function SearchProvider({ children }: { children: React.ReactNode }) {
     // Auto Search
     useEffect(() => {
 
-        if(!autoSearch || isMobile || location.pathname !== '/') return;
+        if(!autoSearch || isMobile || location.pathname !== '/' || loading) return;
 
         pagination.reset();
         searchRecipes({ query, page: pagination.activePage, pageSize: 5 });
@@ -66,13 +66,7 @@ export function SearchProvider({ children }: { children: React.ReactNode }) {
     // Update the results
     useEffect(() => {
         setData(searchResults);
-
-        let timeout = setTimeout(() => {
-            setLoadingOverride(false);
-        }, 200); // safe buffer
-
-        return () => clearTimeout(timeout);
-
+        setLoadingOverride(false);
     }, [searchResults]);
 
 
@@ -97,21 +91,19 @@ export function SearchProvider({ children }: { children: React.ReactNode }) {
 
 
     useEffect(() => {
-        console.log("active page changed");
-        setLoadingOverride(true);
         searchRecipes({ query, page: pagination.activePage, pageSize: PAGE_SIZE });
     }, [pagination.activePage]);
 
     const handleSearch = () => {
         pagination.reset();
-        if(isInitialSearch) {
-            setLayoutState(LayoutState.HEADER)
-            setAutoSearch(true);
-        }
         if(location.pathname !== '/') {
           navigate(`/?q=${encodeURIComponent(searchTerm)}`, { replace: true });
         }
         searchRecipes({ query: searchTerm, page: 1, pageSize: PAGE_SIZE });
+        if(isInitialSearch) {
+            setLayoutState(LayoutState.HEADER)
+            setAutoSearch(true);
+        }
     }
 
 

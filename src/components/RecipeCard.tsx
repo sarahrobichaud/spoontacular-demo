@@ -24,6 +24,7 @@ export function RecipeCard({ recipe, ...props }: RecipeCardProps) {
     };
 
     const { getNoMotionOverride } = useSafeAnimations();
+
     return (
     <motion.div
       ref={ref}
