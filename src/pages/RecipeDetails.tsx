@@ -13,7 +13,7 @@ export default function RecipeDetails() {
 	const { layoutState, setLayoutState } = useLayout()
 	const { prefersReducedMotion } = useAnimationPrefs()
 	const { recipe, loading, error } = useRecipeDetails(id)
-	const { query, pagination, cuisinesStringParam } = useSearch()
+	const { query, totalResults, cuisinesStringParam } = useSearch()
 
 	useEffect(() => {
 		if (layoutState === 'centered') {
@@ -63,7 +63,7 @@ export default function RecipeDetails() {
 			exit={prefersReducedMotion ? {} : { opacity: 0 }}
 			transition={prefersReducedMotion ? { duration: 0 } : { duration: 0.3 }}
 		>
-			{query && pagination.totalResults >= 1 ? (
+			{query && totalResults >= 1 ? (
 				<Link
 					to={`/search?q=${query}&cuisine=${cuisinesStringParam}`}
 					className='button mb-4 inline-block gap-2'
@@ -82,7 +82,7 @@ export default function RecipeDetails() {
 								clipRule='evenodd'
 							/>
 						</svg>
-						<span>Back to {pagination.totalResults} results</span>
+						<span>Back to {totalResults} results</span>
 					</div>
 				</Link>
 			) : (
@@ -227,46 +227,46 @@ export default function RecipeDetails() {
 
 														{(step.ingredients.length > 0 ||
 															step.equipment.length > 0) && (
-															<div className='mt-2 flex flex-wrap gap-4'>
-																{step.ingredients.length > 0 && (
-																	<div className='flex items-center'>
-																		<span className='text-sm text-gray-600 mr-2'>
-																			Ingredients:
-																		</span>
-																		<div className='flex flex-wrap gap-1'>
-																			{step.ingredients.map(
-																				(ing, i: number) => (
+																<div className='mt-2 flex flex-wrap gap-4'>
+																	{step.ingredients.length > 0 && (
+																		<div className='flex items-center'>
+																			<span className='text-sm text-gray-600 mr-2'>
+																				Ingredients:
+																			</span>
+																			<div className='flex flex-wrap gap-1'>
+																				{step.ingredients.map(
+																					(ing, i: number) => (
+																						<span
+																							key={`${ing.id}-${i}`}
+																							className='text-sm glassy-badge'
+																						>
+																							{ing.name}
+																						</span>
+																					)
+																				)}
+																			</div>
+																		</div>
+																	)}
+
+																	{step.equipment.length > 0 && (
+																		<div className='flex items-center'>
+																			<span className='text-sm text-gray-600 mr-2'>
+																				Equipment:
+																			</span>
+																			<div className='flex flex-wrap gap-1'>
+																				{step.equipment.map((eq, i: number) => (
 																					<span
-																						key={`${ing.id}-${i}`}
+																						key={`${eq.id}-${i}`}
 																						className='text-sm glassy-badge'
 																					>
-																						{ing.name}
+																						{eq.name}
 																					</span>
-																				)
-																			)}
+																				))}
+																			</div>
 																		</div>
-																	</div>
-																)}
-
-																{step.equipment.length > 0 && (
-																	<div className='flex items-center'>
-																		<span className='text-sm text-gray-600 mr-2'>
-																			Equipment:
-																		</span>
-																		<div className='flex flex-wrap gap-1'>
-																			{step.equipment.map((eq, i: number) => (
-																				<span
-																					key={`${eq.id}-${i}`}
-																					className='text-sm glassy-badge'
-																				>
-																					{eq.name}
-																				</span>
-																			))}
-																		</div>
-																	</div>
-																)}
-															</div>
-														)}
+																	)}
+																</div>
+															)}
 													</li>
 												)
 											})}

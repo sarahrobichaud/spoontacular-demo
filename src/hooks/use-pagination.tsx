@@ -2,17 +2,21 @@ import { useState } from 'react'
 import { useDebounce } from './use-debounce'
 
 export type PaginationInfo = {
+	// Metadata
 	currentPage: number
 	activePage: number
 	pendingPageChange: boolean
 	totalPages: number
-	reset: () => void
 	canGoToNextPage: boolean
 	canGoToPreviousPage: boolean
-	handleNextPage: () => void
-	handlePreviousPage: () => void
 	offset: number
 	totalResults: number
+	isAvailable: boolean
+
+	// Public API
+	handleNextPage: () => void
+	handlePreviousPage: () => void
+	reset: () => void
 }
 
 export function usePagination(
@@ -52,6 +56,7 @@ export function usePagination(
 		activePage,
 		pendingPageChange,
 		reset,
+		isAvailable: totalResults > pageSize,
 		totalPages,
 		canGoToNextPage,
 		canGoToPreviousPage,

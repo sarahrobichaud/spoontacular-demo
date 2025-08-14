@@ -1,3 +1,4 @@
+import { mockDetailedRecipe, mockRecipes } from '../data/mockRecipes';
 import { fetchSpoonacular } from '../lib/spoon-api'
 
 export interface Recipe {
@@ -77,9 +78,27 @@ export interface RecipeSearchResponse {
 	totalResults: number
 }
 
+const DEBUG = true;
+
 export async function complexSearch(
 	params: RecipeSearchParams
 ): Promise<RecipeSearchResponse> {
+
+	await new Promise(resolve => setTimeout(resolve, 1000))
+	if (DEBUG) {
+		const includes = mockRecipes.filter(recipe => {
+			return recipe.title.toLowerCase().includes(params.query?.toLowerCase() ?? '')
+		})
+		console.log(includes)
+		const slicedRecipes = includes.slice(params.offset ?? 0, (params.offset ?? 0) + (params.number ?? 5))
+		console.log({ params })
+		return {
+			results: slicedRecipes,
+			offset: params.offset ?? 0,
+			number: slicedRecipes.length,
+			totalResults: includes.length,
+		}
+	}
 	return fetchSpoonacular<RecipeSearchResponse>(
 		'/recipes/complexSearch',
 		params
@@ -89,6 +108,10 @@ export async function complexSearch(
 export async function getRecipeInformation(
 	id: number
 ): Promise<DetailedRecipe> {
+	await new Promise(resolve => setTimeout(resolve, 1000))
+	if (DEBUG) {
+		return mockDetailedRecipe
+	}
 	return fetchSpoonacular<DetailedRecipe>(`/recipes/${id}/information`, {
 		includeNutrition: true,
 	})

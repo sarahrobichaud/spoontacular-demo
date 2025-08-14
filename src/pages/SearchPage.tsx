@@ -5,7 +5,8 @@ import RecipeIdeasPrompt from '../components/RecipeIdeaPrompt'
 import { CustomLoader } from '../components/ui/CustomLoader'
 import { RecipeCard } from '../components/RecipeCard'
 import { useAnimationPrefs } from '../contexts/AnimationContext'
-import { useSearch } from '../contexts/SearchContext'
+import { useSearch, PAGE_SIZE } from '../contexts/SearchContext'
+import { usePagination } from '../hooks/use-pagination'
 
 import type { Recipe } from '../services/spoonacular'
 import { Pagination } from '../components/ui/Pagination'
@@ -16,23 +17,46 @@ import { Filter, LoaderCircle, X } from 'lucide-react'
 import clsx from 'clsx'
 
 export default function SearchPage() {
-	const { searchTerm, pagination, loading, data, query, cuisineHasChanged } =
-		useSearch()
+	const {
+		searchTerm,
+		loading,
+		data,
+		query,
+		cuisineHasChanged,
+		totalResults,
+		handleSearch,
+		setExternalLoading
+	} = useSearch()
+
 	const [isFilterOpen, setIsFilterOpen] = useState(false)
 
 	const { isCentered } = useLayout()
-
-	useEffect(() => {
-		// Scroll to top when page changes
-		window.scrollTo({
-			top: 0,
-			behavior: prefersReducedMotion ? 'auto' : 'smooth',
-		})
-	}, [pagination.currentPage])
-
 	const { prefersReducedMotion } = useAnimationPrefs()
-
 	const isMobile = useIsMobile()
+
+	// Pagination Management
+
+	const pagination = usePagination(PAGE_SIZE, totalResults)
+	// Set loading state on page change
+	useEffect(() => {
+		setExternalLoading(pagination.pendingPageChange)
+	}, [pagination.pendingPageChange, setExternalLoading])
+
+
+	// When the active page changes, trigger a new search
+	useEffect(() => {
+		if (query.trim() !== '') {
+			handleSearch(pagination.activePage)
+		}
+	}, [pagination.activePage])
+
+
+	// Reset pagination when the query changes
+	useEffect(() => {
+		pagination.reset()
+	}, [query])
+
+	const isPaginationAvailable = pagination.isAvailable && query.trim() !== ''
 
 	return (
 		<div className='w-full min-h-screen'>
@@ -70,10 +94,10 @@ export default function SearchPage() {
 							{data.length > 0 && query.trim() !== '' && (
 								<>
 									<h3 className='mb-4 text-lg  font-semibold'>
-										{pagination.totalResults}{' '}
-										{pagination.totalResults === 1 ? 'recipe' : 'recipes'} found
+										{totalResults}{' '}
+										{totalResults === 1 ? 'recipe' : 'recipes'} found
 									</h3>
-									{pagination.available && (
+									{isPaginationAvailable && (
 										<Pagination
 											pagination={pagination}
 											className='w-full'
