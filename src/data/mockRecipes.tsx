@@ -1,6 +1,6 @@
 // Mock data for development
 
-import type { DetailedRecipe } from '../services/spoonacular'
+import type { DetailedRecipe } from '../features/search/search-types'
 
 export const mockDetailedRecipe: DetailedRecipe = {
 	id: 1,

@@ -1,19 +1,31 @@
-import { useParams, Link } from 'react-router'
+import { useParams, Link, useOutletContext } from 'react-router'
 import { motion } from 'framer-motion'
 import { useEffect } from 'react'
 import { useLayout } from '../contexts/LayoutContext'
 import { useAnimationPrefs } from '../contexts/AnimationContext'
-import { useRecipeDetails } from '../hooks/use-recipe-details'
 import { CustomLoader } from '../components/ui/CustomLoader'
-import { useSearch } from '../contexts/SearchContext'
+import type { GlobalSearchAPI } from '../features/search/search-types'
+import { useSearchFeature } from '../features/search/hooks/use-search'
+
+interface RecipeDetailsProps {
+	search: GlobalSearchAPI
+}
+
 
 export default function RecipeDetails() {
 	const { id } = useParams()
 
 	const { layoutState, setLayoutState } = useLayout()
 	const { prefersReducedMotion } = useAnimationPrefs()
-	const { recipe, loading, error } = useRecipeDetails(id)
-	const { query, totalResults, cuisinesStringParam } = useSearch()
+
+	const { useRecipeDetails } = useSearchFeature()
+
+	const { search } = useOutletContext<RecipeDetailsProps>()
+	const { recipe, loading, error, searchByID } = useRecipeDetails()
+
+	useEffect(() => {
+		searchByID(Number(id))
+	}, [id, searchByID])
 
 	useEffect(() => {
 		if (layoutState === 'centered') {
@@ -63,9 +75,9 @@ export default function RecipeDetails() {
 			exit={prefersReducedMotion ? {} : { opacity: 0 }}
 			transition={prefersReducedMotion ? { duration: 0 } : { duration: 0.3 }}
 		>
-			{query && totalResults >= 1 ? (
+			{search.query && search.totalResults >= 1 ? (
 				<Link
-					to={`/search?q=${query}&cuisine=${cuisinesStringParam}`}
+					to={`/?q=${search.query}&cuisine=${search.cuisinesStringParam}`}
 					className='button mb-4 inline-block gap-2'
 				>
 					<div className='flex items-center gap-2'>
@@ -82,7 +94,7 @@ export default function RecipeDetails() {
 								clipRule='evenodd'
 							/>
 						</svg>
-						<span>Back to {totalResults} results</span>
+						<span>Back to {search.totalResults} results</span>
 					</div>
 				</Link>
 			) : (

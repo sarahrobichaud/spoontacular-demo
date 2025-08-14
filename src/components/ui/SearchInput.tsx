@@ -1,22 +1,29 @@
 import type { FormEvent, HTMLAttributes } from 'react'
+import type { GlobalSearchAPI } from '../../features/search/search-types'
 
-interface SearchInputProps {
-	onSubmit: (e: FormEvent<HTMLFormElement>) => void
-	searchTerm: string
-	setSearchTerm: (term: string) => void
-	canSearch: boolean
+interface SearchInputProps extends HTMLAttributes<HTMLFormElement> {
+	search: GlobalSearchAPI
+	onSearch?: () => void
 }
 
 export function SearchInput({
-	onSubmit,
-	searchTerm,
-	setSearchTerm,
-	canSearch,
+	search,
+	onSearch,
 	...props
-}: SearchInputProps & HTMLAttributes<HTMLFormElement>) {
+}: SearchInputProps) {
+
+	const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+		e.preventDefault()
+		if (onSearch) {
+			onSearch()
+		} else {
+			search.executeSearch()
+		}
+	}
+
 	return (
 		<form
-			onSubmit={onSubmit}
+			onSubmit={handleSubmit}
 			{...props}
 		>
 			<div className='relative interactable'>
@@ -24,15 +31,15 @@ export function SearchInput({
 					type='search'
 					className='w-full px-6 py-4 rounded-md border shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500'
 					placeholder='Search for recipes...'
-					value={searchTerm}
-					onChange={e => setSearchTerm(e.target.value)}
+					value={search.query}
+					onChange={e => search.updateQuery(e.target.value)}
 					aria-label='Search for recipes'
 				/>
 				<button
 					type='submit'
 					className='absolute right-4 top-1/2 transform -translate-y-1/2 bg-blue-500 text-white p-2 button'
 					aria-label='Submit search'
-					disabled={!canSearch}
+					disabled={!search.canSearch}
 				>
 					<svg
 						xmlns='http://www.w3.org/2000/svg'

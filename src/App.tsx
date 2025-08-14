@@ -1,6 +1,5 @@
 import { createBrowserRouter, Outlet, RouterProvider } from 'react-router'
 import DefaultLayout from './layouts/Default'
-import SearchPage from './pages/SearchPage'
 import RecipeDetails from './pages/RecipeDetails'
 import ErrorPage from './pages/ErrorPage'
 import { ApiKeyForm } from './components/ApiKeyForm'
@@ -9,6 +8,8 @@ import { ApiKeyProvider, useApiKey } from './contexts/ApiKeyContext'
 import './styles/globals.css'
 import './styles/tailwind.css'
 import { AppProvider } from './contexts/AppProvider'
+import SearchPage from './pages/SearchPage'
+import HomePage from './pages/home-page'
 
 const AppContent = () => {
 	const { apiKey, isLoaded } = useApiKey()
@@ -50,13 +51,24 @@ const AppContent = () => {
 			],
 		},
 		{
-			path: '/',
+			path: '/search',
 			element: defaultElement,
 			errorElement: errorElement,
 			children: [
 				{
 					index: true,
 					element: apiKey ? <SearchPage /> : <ApiKeyForm />,
+				},
+			],
+		},
+		{
+			path: '/',
+			element: defaultElement,
+			errorElement: errorElement,
+			children: [
+				{
+					index: true,
+					element: apiKey ? <HomePage /> : <ApiKeyForm />,
 				},
 			],
 		},

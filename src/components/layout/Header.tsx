@@ -2,15 +2,18 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { useLayout } from '../../contexts/LayoutContext'
 import { LayoutState } from '../../contexts/LayoutContext'
 import { useIsMobile } from '../../hooks/use-mobile'
-import type { FormEvent } from 'react'
 import { useAnimationPrefs } from '../../contexts/AnimationContext'
 import { useSafeAnimations } from '../../hooks/use-safe-animations'
-import { useSearch } from '../../contexts/SearchContext'
 import { SearchInput } from '../ui/SearchInput'
 import { Sparkles, TrashIcon } from 'lucide-react'
 import { useApiKey } from '../../contexts/ApiKeyContext'
-export default function Header() {
-	const { searchTerm, setSearchTerm, handleSearch, canSearch } = useSearch()
+import type { GlobalSearchAPI } from '../../features/search/search-types'
+
+interface HeaderProps {
+	search: GlobalSearchAPI
+}
+
+export default function Header({ search }: HeaderProps) {
 	const { layoutState, isCentered } = useLayout()
 
 	const isMobile = useIsMobile()
@@ -18,11 +21,6 @@ export default function Header() {
 	const { prefersReducedMotion, toggleReducedMotion } = useAnimationPrefs()
 
 	const { getNoMotionOverride } = useSafeAnimations()
-
-	const search = (e: FormEvent<HTMLFormElement>) => {
-		e.preventDefault()
-		handleSearch()
-	}
 
 	return (
 		<>
@@ -32,24 +30,18 @@ export default function Header() {
 					style={
 						!prefersReducedMotion
 							? {
-									opacity: isCentered ? 0 : 1,
-									transform: `translateY(${isCentered ? '100px' : '0'})`,
-									transition:
-										'opacity 0.3s ease-in-out, transform 0.3s ease-in-out',
-								}
+								opacity: isCentered ? 0 : 1,
+								transform: `translateY(${isCentered ? '100px' : '0'})`,
+								transition:
+									'opacity 0.3s ease-in-out, transform 0.3s ease-in-out',
+							}
 							: {
-									opacity: 1,
-								}
+								opacity: 1,
+							}
 					}
 				>
 					<div className=''>
-						<SearchInput
-							className='text-[16px]'
-							searchTerm={searchTerm}
-							setSearchTerm={setSearchTerm}
-							canSearch={canSearch}
-							onSubmit={search}
-						/>
+						<SearchInput className='text-[16px]' search={search} />
 					</div>
 				</div>
 			)}
@@ -80,13 +72,7 @@ export default function Header() {
 									}
 								>
 									<div className='max-w-[100%]'>
-										<SearchInput
-											className='text-[16px]'
-											searchTerm={searchTerm}
-											setSearchTerm={setSearchTerm}
-											canSearch={canSearch}
-											onSubmit={search}
-										/>
+										<SearchInput className='text-[16px]' search={search} />
 									</div>
 								</motion.div>
 							)}

@@ -5,58 +5,46 @@ import RecipeIdeasPrompt from '../components/RecipeIdeaPrompt'
 import { CustomLoader } from '../components/ui/CustomLoader'
 import { RecipeCard } from '../components/RecipeCard'
 import { useAnimationPrefs } from '../contexts/AnimationContext'
-import { useSearch, PAGE_SIZE } from '../contexts/SearchContext'
 import { usePagination } from '../hooks/use-pagination'
 
-import type { Recipe } from '../services/spoonacular'
+import type { Recipe } from '../features/search/search-types'
 import { Pagination } from '../components/ui/Pagination'
 import { SearchComponent } from '../components/SearchComponent'
 import { CuisineSelector } from '../components/CuisideSelector'
 import { useIsMobile } from '../hooks/use-mobile'
 import { Filter, LoaderCircle, X } from 'lucide-react'
 import clsx from 'clsx'
+import type { GlobalSearchAPI } from '../features/search/search-types'
+import { useOutletContext } from 'react-router'
+import { PAGE_SIZE } from '../features/search/hooks/use-search'
+
+export interface SearchPageProps {
+	search: GlobalSearchAPI
+}
 
 export default function SearchPage() {
-	const {
-		searchTerm,
-		loading,
-		data,
-		query,
-		cuisineHasChanged,
-		totalResults,
-		handleSearch,
-		setExternalLoading
-	} = useSearch()
-
 	const [isFilterOpen, setIsFilterOpen] = useState(false)
+
+	const { search } = useOutletContext<SearchPageProps>()
 
 	const { isCentered } = useLayout()
 	const { prefersReducedMotion } = useAnimationPrefs()
 	const isMobile = useIsMobile()
 
 	// Pagination Management
+	const pagination = usePagination(PAGE_SIZE, search.totalResults)
+	const isPaginationAvailable = pagination.isAvailable && search.query.trim() !== ''
 
-	const pagination = usePagination(PAGE_SIZE, totalResults)
-	// Set loading state on page change
 	useEffect(() => {
-		setExternalLoading(pagination.pendingPageChange)
-	}, [pagination.pendingPageChange, setExternalLoading])
-
-
-	// When the active page changes, trigger a new search
-	useEffect(() => {
-		if (query.trim() !== '') {
-			handleSearch(pagination.activePage)
+		if (search.canSearch) {
+			search.executeSearch(pagination.activePage)
 		}
 	}, [pagination.activePage])
 
-
-	// Reset pagination when the query changes
 	useEffect(() => {
 		pagination.reset()
-	}, [query])
+	}, [search.query, search.cuisines])
 
-	const isPaginationAvailable = pagination.isAvailable && query.trim() !== ''
 
 	return (
 		<div className='w-full min-h-screen'>
@@ -67,11 +55,11 @@ export default function SearchPage() {
 					})}
 				>
 					<div className='order-2 lg:order-1'>
-						{isCentered && <SearchComponent />}
-						{!isCentered && !loading && searchTerm === '' && (
+						{isCentered && <SearchComponent search={search} />}
+						{!isCentered && !search.loading && search.query === '' && (
 							<RecipeIdeasPrompt />
 						)}
-						{!isCentered && searchTerm !== '' && (
+						{!isCentered && search.query !== '' && (
 							<motion.div
 								key='results'
 								className='w-full'
@@ -83,19 +71,19 @@ export default function SearchPage() {
 								}
 							>
 								<SearchResults
-									data={data}
-									isLoading={loading}
+									data={search.results}
+									isLoading={search.loading}
 								/>
 							</motion.div>
 						)}
 					</div>
 					{!isCentered && (
 						<div className='order-1 lg:order-2'>
-							{data.length > 0 && query.trim() !== '' && (
+							{search.results.length > 0 && search.query.trim() !== '' && (
 								<>
 									<h3 className='mb-4 text-lg  font-semibold'>
-										{totalResults}{' '}
-										{totalResults === 1 ? 'recipe' : 'recipes'} found
+										{search.totalResults}{' '}
+										{search.totalResults === 1 ? 'recipe' : 'recipes'} found
 									</h3>
 									{isPaginationAvailable && (
 										<Pagination
@@ -113,7 +101,7 @@ export default function SearchPage() {
 							>
 								<h3 className='my-4 text-lg font-semibold flex items-center gap-2'>
 									Filter by cuisine
-									{cuisineHasChanged && (
+									{search.cuisineIsPending && (
 										<LoaderCircle className='w-4 h-4 animate-spin' />
 									)}
 								</h3>
@@ -132,7 +120,10 @@ export default function SearchPage() {
 								)}
 							</div>
 							{((isMobile && isFilterOpen) || !isMobile) && (
-								<CuisineSelector className='flex gap-2 flex-wrap w-full' />
+								<CuisineSelector
+									search={search}
+									className='flex gap-2 flex-wrap w-full'
+								/>
 							)}
 						</div>
 					)}
@@ -146,6 +137,7 @@ function SearchResults({
 	data,
 	isLoading,
 }: { data: Recipe[]; isLoading: boolean }) {
+	console.log({ data, loading: isLoading })
 	if (data.length === 0 && !isLoading) {
 		return (
 			<div className='w-full'>
@@ -157,11 +149,12 @@ function SearchResults({
 			</div>
 		)
 	}
-	return (
-		<div className='w-full'>
-			<h2 className='text-xl font-semibold mb-4'>Search Results</h2>
-			{isLoading && <CustomLoader />}
-			{!isLoading && (
+
+	const renderResult = () => {
+		if (isLoading) {
+			return <CustomLoader />
+		} else {
+			return (
 				<div className='grid grid-cols-1 gap-4'>
 					{data.map((recipe: Recipe) => {
 						return (
@@ -171,8 +164,14 @@ function SearchResults({
 							/>
 						)
 					})}
-				</div>
-			)}
+				</div>)
+		}
+	}
+
+	return (
+		<div className='w-full'>
+			<h2 className='text-xl font-semibold mb-4'>Search Results</h2>
+			{renderResult()}
 		</div>
 	)
 }

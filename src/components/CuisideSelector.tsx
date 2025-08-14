@@ -1,19 +1,23 @@
 import type { HTMLAttributes } from 'react'
 import clsx from 'clsx'
 import { AVAILABLE_CUISINES } from '../data/cuisines'
-import { useSearch } from '../contexts/SearchContext'
+import type { GlobalSearchAPI } from '../features/search/search-types'
 
-export const CuisineSelector = (props: HTMLAttributes<HTMLDivElement>) => {
-	const { includeAllCuisines, hasCuisine, toggleCuisine } = useSearch()
+interface CuisineSelectorProps extends HTMLAttributes<HTMLDivElement> {
+	search: GlobalSearchAPI
+}
+
+export const CuisineSelector = ({ search, ...props }: CuisineSelectorProps) => {
+	const { hasAnyCuisines, hasCuisine, toggleCuisine } = search
 	return (
 		<div {...props}>
 			<button
 				type='button'
 				className={clsx('glassy-badge', {
-					active: includeAllCuisines,
-					interactive: !includeAllCuisines,
+					active: !hasAnyCuisines,
+					interactive: hasAnyCuisines,
 				})}
-				disabled={includeAllCuisines}
+				disabled={!hasAnyCuisines}
 				onClick={() => toggleCuisine('all')}
 			>
 				All Cuisines
@@ -25,7 +29,7 @@ export const CuisineSelector = (props: HTMLAttributes<HTMLDivElement>) => {
 					className={clsx(
 						'glassy-badge interactive min-h-[44px] min-w-[44px]',
 						{
-							active: hasCuisine(c.toLowerCase()) && !includeAllCuisines,
+							active: hasCuisine(c.toLowerCase())
 						}
 					)}
 					onClick={() => toggleCuisine(c.toLowerCase())}

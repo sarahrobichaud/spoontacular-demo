@@ -1,18 +1,19 @@
 import { motion } from 'framer-motion'
 import { useAnimationPrefs } from '../contexts/AnimationContext'
-import { useSearch } from '../contexts/SearchContext'
-import type { FormEvent } from 'react'
 import { CuisineSelector } from './CuisideSelector'
 import { SearchInput } from './ui/SearchInput'
+import type { GlobalSearchAPI } from '../features/search/search-types'
+import { useNavigate } from 'react-router'
 
-export function SearchComponent() {
+interface SearchComponentProps {
+	search: GlobalSearchAPI
+}
+
+export function SearchComponent({ search }: SearchComponentProps) {
 	const prefersReducedMotion = useAnimationPrefs()
-	const { searchTerm, setSearchTerm, handleSearch, canSearch } = useSearch()
-
-	const search = (e: FormEvent<HTMLFormElement>) => {
-		e.preventDefault()
-		if (!canSearch) return
-		handleSearch()
+	const navigate = useNavigate()
+	const onSearch = () => {
+		navigate(`/search?query=${search.query}&cuisines=${search.cuisinesStringParam}`)
 	}
 
 	return (
@@ -32,12 +33,13 @@ export function SearchComponent() {
 				<div className='lg:max-w-[80%] mx-auto w-full'>
 					<SearchInput
 						className='font-4xl'
-						searchTerm={searchTerm}
-						setSearchTerm={setSearchTerm}
-						canSearch={canSearch}
-						onSubmit={search}
+						search={search}
+						onSearch={onSearch}
 					/>
-					<CuisineSelector className='mt-8 flex justify-center gap-2 w-full flex-wrap' />
+					<CuisineSelector
+						search={search}
+						className='mt-8 flex justify-center gap-2 w-full flex-wrap'
+					/>
 				</div>
 			</div>
 		</motion.div>

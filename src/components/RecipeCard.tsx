@@ -1,5 +1,5 @@
 import { Link } from 'react-router'
-import type { Recipe } from '../services/spoonacular'
+import type { Recipe } from '../features/search/search-types'
 import { motion } from 'framer-motion'
 import { useParallax } from '../hooks/use-parallax'
 import { useAnimationPrefs } from '../contexts/AnimationContext'
@@ -21,9 +21,9 @@ export function RecipeCard({ recipe, ...props }: RecipeCardProps) {
 	const parallaxHandlers = prefersReducedMotion
 		? {}
 		: {
-				onMouseMove: handleMouseMove,
-				onMouseLeave: handleMouseLeave,
-			}
+			onMouseMove: handleMouseMove,
+			onMouseLeave: handleMouseLeave,
+		}
 
 	const { getNoMotionOverride } = useSafeAnimations()
 
