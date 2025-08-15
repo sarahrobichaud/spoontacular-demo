@@ -5,12 +5,15 @@ import type { CuisineSelection } from '../search-types'
 export function useCuisineSelection(debounceMs: number = 500): CuisineSelection {
     const [cuisines, setCuisines] = useState<string[]>([])
 
-    const { debouncedValue: debouncedCuisines, isDebouncing } = useAdvancedDebounce(
+    const { debouncedValue: debouncedCuisines, isDebouncing, reset } = useAdvancedDebounce(
         cuisines,
         debounceMs
     )
 
     const cuisineString = useMemo(() => {
+        if (debouncedCuisines.length === 0) {
+            return ''
+        }
         return debouncedCuisines.join(',')
     }, [debouncedCuisines])
 
@@ -54,6 +57,11 @@ export function useCuisineSelection(debounceMs: number = 500): CuisineSelection 
 
     const hasAnyCuisines = cuisines.length > 0
 
+    const resetCuisines = (values: string[]) => {
+        setCuisines(values)
+        reset(values)
+    }
+
     return {
         cuisines,
         cuisineString,
@@ -64,6 +72,7 @@ export function useCuisineSelection(debounceMs: number = 500): CuisineSelection 
         toggleCuisine,
         clearCuisines,
         hasCuisine,
-        hasAnyCuisines
+        resetCuisines,
+        hasAnyCuisines,
     }
 }

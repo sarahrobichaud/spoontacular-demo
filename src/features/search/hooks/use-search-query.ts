@@ -5,7 +5,7 @@ import type { SearchQuery } from '../search-types'
 export function useSearchQuery(debounceMs: number = 500): SearchQuery {
     const [query, setQuery] = useState('')
 
-    const { debouncedValue: debouncedQuery, isDebouncing } = useAdvancedDebounce(
+    const { debouncedValue: debouncedQuery, isDebouncing, reset } = useAdvancedDebounce(
         query,
         debounceMs
     )
@@ -18,11 +18,17 @@ export function useSearchQuery(debounceMs: number = 500): SearchQuery {
         setQuery('')
     }
 
+    const resetQuery = (value: string) => {
+        setQuery(value)
+        reset(value)
+    }
+
     return {
         query,
         debouncedQuery,
         isDebouncing,
         updateQuery,
-        clearQuery
+        clearQuery,
+        resetQuery
     }
 }

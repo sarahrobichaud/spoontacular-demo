@@ -1,6 +1,4 @@
 import { AnimatePresence, motion } from 'framer-motion'
-import { useLayout } from '../../contexts/LayoutContext'
-import { LayoutState } from '../../contexts/LayoutContext'
 import { useIsMobile } from '../../hooks/use-mobile'
 import { useAnimationPrefs } from '../../contexts/AnimationContext'
 import { useSafeAnimations } from '../../hooks/use-safe-animations'
@@ -8,13 +6,15 @@ import { SearchInput } from '../ui/SearchInput'
 import { Sparkles, TrashIcon } from 'lucide-react'
 import { useApiKey } from '../../contexts/ApiKeyContext'
 import type { GlobalSearchAPI } from '../../features/search/search-types'
+import { useLocation, useNavigate } from 'react-router'
 
 interface HeaderProps {
 	search: GlobalSearchAPI
 }
 
 export default function Header({ search }: HeaderProps) {
-	const { layoutState, isCentered } = useLayout()
+	const location = useLocation()
+	const navigate = useNavigate();
 
 	const isMobile = useIsMobile()
 	const { apiKey, clearApiKey } = useApiKey()
@@ -22,26 +22,27 @@ export default function Header({ search }: HeaderProps) {
 
 	const { getNoMotionOverride } = useSafeAnimations()
 
+	const displaySearch = location.pathname !== '/'
+
+	const onSearch = async () => {
+		if (location.pathname !== '/search') {
+			void await navigate(`/search?query=${search.query}&cuisines=${search.cuisinesStringParam}`)
+		}
+		search.executeSearch()
+	}
+
 	return (
 		<>
-			{isMobile && layoutState !== LayoutState.CENTERED && (
+			{isMobile && displaySearch && (
 				<div
 					className='fixed bottom-0 left-0 right-0 container mx-auto px-4 bg-black z-10 py-4 border-t-2 border-gray-300/10 min-h-[100px]'
-					style={
-						!prefersReducedMotion
-							? {
-								opacity: isCentered ? 0 : 1,
-								transform: `translateY(${isCentered ? '100px' : '0'})`,
-								transition:
-									'opacity 0.3s ease-in-out, transform 0.3s ease-in-out',
-							}
-							: {
-								opacity: 1,
-							}
-					}
 				>
 					<div className=''>
-						<SearchInput className='text-[16px]' search={search} />
+						<SearchInput
+							className='text-[16px]'
+							search={search}
+							onSearch={onSearch}
+						/>
 					</div>
 				</div>
 			)}
@@ -61,7 +62,7 @@ export default function Header({ search }: HeaderProps) {
 					</a>
 					{!isMobile && (
 						<AnimatePresence>
-							{layoutState === 'header' && (
+							{displaySearch && (
 								<motion.div
 									className='flex-1 max-w-lg mx-4'
 									initial={prefersReducedMotion ? {} : { opacity: 0, y: -10 }}
@@ -72,7 +73,11 @@ export default function Header({ search }: HeaderProps) {
 									}
 								>
 									<div className='max-w-[100%]'>
-										<SearchInput className='text-[16px]' search={search} />
+										<SearchInput
+											className='text-[16px]'
+											search={search}
+											onSearch={onSearch}
+										/>
 									</div>
 								</motion.div>
 							)}

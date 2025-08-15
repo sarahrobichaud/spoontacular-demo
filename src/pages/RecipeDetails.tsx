@@ -1,7 +1,6 @@
-import { useParams, Link, useOutletContext } from 'react-router'
+import { useParams, Link, useOutletContext, useSearchParams } from 'react-router'
 import { motion } from 'framer-motion'
 import { useEffect } from 'react'
-import { useLayout } from '../contexts/LayoutContext'
 import { useAnimationPrefs } from '../contexts/AnimationContext'
 import { CustomLoader } from '../components/ui/CustomLoader'
 import type { GlobalSearchAPI } from '../features/search/search-types'
@@ -11,12 +10,11 @@ interface RecipeDetailsProps {
 	search: GlobalSearchAPI
 }
 
-
 export default function RecipeDetails() {
 	const { id } = useParams()
 
-	const { layoutState, setLayoutState } = useLayout()
 	const { prefersReducedMotion } = useAnimationPrefs()
+	const [searchParams] = useSearchParams()
 
 	const { useRecipeDetails } = useSearchFeature()
 
@@ -25,18 +23,8 @@ export default function RecipeDetails() {
 
 	useEffect(() => {
 		searchByID(Number(id))
-	}, [id, searchByID])
+	}, [])
 
-	useEffect(() => {
-		if (layoutState === 'centered') {
-			setLayoutState('header')
-		}
-
-		window.scrollTo({
-			top: 0,
-			behavior: prefersReducedMotion ? 'auto' : 'smooth',
-		})
-	}, [layoutState, setLayoutState, prefersReducedMotion])
 
 	if (loading) {
 		return <CustomLoader />
@@ -77,7 +65,7 @@ export default function RecipeDetails() {
 		>
 			{search.query && search.totalResults >= 1 ? (
 				<Link
-					to={`/?q=${search.query}&cuisine=${search.cuisinesStringParam}`}
+					to={`/search?query=${search.query}&cuisines=${search.cuisinesStringParam}&page=${searchParams.get('pageRef') ?? 1}`}
 					className='button mb-4 inline-block gap-2'
 				>
 					<div className='flex items-center gap-2'>

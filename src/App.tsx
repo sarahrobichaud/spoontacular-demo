@@ -8,7 +8,7 @@ import { ApiKeyProvider, useApiKey } from './contexts/ApiKeyContext'
 import './styles/globals.css'
 import './styles/tailwind.css'
 import { AppProvider } from './contexts/AppProvider'
-import SearchPage from './pages/SearchPage'
+import SearchPage from './pages/result-page'
 import HomePage from './pages/home-page'
 
 const AppContent = () => {

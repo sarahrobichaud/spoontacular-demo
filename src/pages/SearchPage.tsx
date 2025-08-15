@@ -5,7 +5,7 @@ import RecipeIdeasPrompt from '../components/RecipeIdeaPrompt'
 import { CustomLoader } from '../components/ui/CustomLoader'
 import { RecipeCard } from '../components/RecipeCard'
 import { useAnimationPrefs } from '../contexts/AnimationContext'
-import { usePagination } from '../hooks/use-pagination'
+import { usePagination } from '../features/search/hooks/use-result-pagination'
 
 import type { Recipe } from '../features/search/search-types'
 import { Pagination } from '../components/ui/Pagination'

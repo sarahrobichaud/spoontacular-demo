@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useDebounce } from './use-debounce'
+import { useDebounce } from '../../../hooks/use-debounce'
 
 export type PaginationInfo = {
 	// Metadata
@@ -19,11 +19,16 @@ export type PaginationInfo = {
 	reset: () => void
 }
 
-export function usePagination(
-	pageSize: number,
+export interface PaginationOptions {
+	pageSize: number
 	totalResults: number
+	defaultPage: number
+}
+
+export function usePagination(
+	{ pageSize, totalResults, defaultPage }: PaginationOptions
 ): PaginationInfo {
-	const [currentPage, setCurrentPage] = useState(1)
+	const [currentPage, setCurrentPage] = useState(defaultPage)
 
 	const [activePage, pendingPageChange, resetActivePage] = useDebounce(
 		currentPage,
@@ -50,6 +55,7 @@ export function usePagination(
 		setCurrentPage(1)
 		resetActivePage(1)
 	}
+
 
 	return {
 		currentPage,

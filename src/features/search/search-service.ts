@@ -48,7 +48,8 @@ export const searchService = (dependencies: SearchServiceDependencies): SearchSe
          * @returns The search results
          */
         async search(params: SearchParams): Promise<SearchResults> {
-            const { query, cuisines, page = 1, pageSize = 10 } = params
+            const { query, cuisines, page = 1 } = params
+            const pageSize = 5
 
             // Don't search if no query or cuisines
             if (!query.trim() && !cuisines.trim()) {

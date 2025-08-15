@@ -1,5 +1,5 @@
 import { LoaderCircle } from 'lucide-react'
-import type { PaginationInfo } from '../../hooks/use-pagination'
+import type { PaginationInfo } from '../../features/search/hooks/use-result-pagination'
 import type { HTMLAttributes } from 'react'
 
 export type PaginationProps = {

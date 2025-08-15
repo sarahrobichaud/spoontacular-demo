@@ -11,6 +11,7 @@ export function useSearchExecution(searchService: SearchService): SearchExecutio
         const currentRequestId = ++requestIdRef.current
 
         setLoading(true)
+
         setError(null)
 
         try {

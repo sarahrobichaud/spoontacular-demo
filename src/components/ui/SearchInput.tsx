@@ -3,7 +3,7 @@ import type { GlobalSearchAPI } from '../../features/search/search-types'
 
 interface SearchInputProps extends HTMLAttributes<HTMLFormElement> {
 	search: GlobalSearchAPI
-	onSearch?: () => void
+	onSearch?: () => Promise<void>
 }
 
 export function SearchInput({
@@ -12,10 +12,11 @@ export function SearchInput({
 	...props
 }: SearchInputProps) {
 
-	const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+	const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
 		e.preventDefault()
+		console.log('handleSubmit', onSearch)
 		if (onSearch) {
-			onSearch()
+			await onSearch()
 		} else {
 			search.executeSearch()
 		}

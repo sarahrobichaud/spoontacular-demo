@@ -4,5 +4,5 @@ import type { GlobalSearchAPI } from "../features/search/search-types";
 
 export default function HomePage() {
     const { search } = useOutletContext<{ search: GlobalSearchAPI }>()
-    return <div><SearchComponent search={search} /></div>
+    return <SearchComponent search={search} />
 }

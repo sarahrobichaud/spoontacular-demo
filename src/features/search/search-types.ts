@@ -1,3 +1,4 @@
+import type { PaginationInfo } from "./hooks/use-result-pagination"
 
 // Core search state
 export interface SearchState {
@@ -15,7 +16,6 @@ export interface SearchParams {
     query: string
     cuisines: string
     page?: number
-    pageSize?: number
 }
 
 // Search results with metadata
@@ -36,12 +36,6 @@ export interface SearchService {
     getRecipeDetails(id: number): Promise<DetailedRecipe>
 }
 
-export interface URLSyncService {
-    updateURL(params: SearchParams): void
-    getParamsFromURL(): Partial<SearchParams>
-    isOnSearchPage(): boolean
-}
-
 export interface RecipeRepository {
     generalSearch(params: RecipeSearchParams): Promise<RecipeSearchResponse>
     getDetails(id: number): Promise<DetailedRecipe>
@@ -53,7 +47,6 @@ export interface SearchServiceDependencies {
 
 export interface SearchDependencies {
     searchService: SearchService
-    urlSync: URLSyncService
     debounceMs?: number
     pageSize?: number
 }
@@ -64,6 +57,7 @@ export interface SearchQuery {
     isDebouncing: boolean
     updateQuery: (query: string) => void
     clearQuery: () => void
+    resetQuery: (value: string) => void
 }
 
 export interface CuisineSelection {
@@ -76,7 +70,8 @@ export interface CuisineSelection {
     toggleCuisine: (cuisine: string) => void
     clearCuisines: () => void
     hasCuisine: (cuisine: string) => boolean
-    hasAnyCuisines: boolean
+    hasAnyCuisines: boolean,
+    resetCuisines: (values: string[]) => void
 }
 
 export interface SearchExecution {
@@ -175,6 +170,8 @@ export interface GlobalSearchAPI {
     // State
     query: string
     cuisines: string[]
+    debouncedQuery: string
+    debouncedCuisines: string[]
     results: Recipe[]
     loading: boolean
     error: string | null
@@ -183,6 +180,9 @@ export interface GlobalSearchAPI {
     hasResults: boolean
     cuisineIsPending: boolean
     queryIsPending: boolean
+
+    pagination: PaginationInfo
+    paginationIsAvailable: boolean
 
     // Query actions 
     updateQuery: (query: string) => void
@@ -197,6 +197,7 @@ export interface GlobalSearchAPI {
 
     // Search actions
     executeSearch: (page?: number) => Promise<void>
+    syncSearchParams: (params: SearchParams) => Promise<void>
     clearResults: () => void
     clearError: () => void
 

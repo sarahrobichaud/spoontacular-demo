@@ -29,6 +29,8 @@ async function fetchSpoonacular<T>(
 		url.searchParams.append(key, String(value))
 	}
 
+	console.log({ url })
+
 	const response = await fetch(url, { headers, ...options })
 
 	if (!response.ok) {

@@ -12,8 +12,8 @@ interface SearchComponentProps {
 export function SearchComponent({ search }: SearchComponentProps) {
 	const prefersReducedMotion = useAnimationPrefs()
 	const navigate = useNavigate()
-	const onSearch = () => {
-		navigate(`/search?query=${search.query}&cuisines=${search.cuisinesStringParam}`)
+	const onSearch = async () => {
+		await navigate(`/search?query=${search.query}&cuisines=${search.cuisinesStringParam}`)
 	}
 
 	return (

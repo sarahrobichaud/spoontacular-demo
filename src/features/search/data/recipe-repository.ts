@@ -1,8 +1,9 @@
 import { mockDetailedRecipe, mockRecipes } from '../../../data/mockRecipes';
+import { env } from '../../../env';
 import { fetchSpoonacular } from '../../../lib/spoon-api'
 import type { DetailedRecipe, RecipeRepository, RecipeSearchParams, RecipeSearchResponse } from '../search-types';
 
-const DEBUG = true;
+const DEBUG = env.useMockData;
 
 export const recipeRepository = (): RecipeRepository => {
 

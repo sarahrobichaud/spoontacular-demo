@@ -4,7 +4,6 @@ export interface DebounceResult<T> {
     value: T
     debouncedValue: T
     isDebouncing: boolean
-    flush: () => void
     cancel: () => void
     reset: (newValue: T) => void
 }
@@ -37,13 +36,6 @@ export function useAdvancedDebounce<T>(
         }
     }, [value, delay])
 
-    const flush = useCallback(() => {
-        if (timeoutRef.current) {
-            clearTimeout(timeoutRef.current)
-        }
-        setDebouncedValue(valueRef.current)
-    }, [])
-
     const cancel = useCallback(() => {
         if (timeoutRef.current) {
             clearTimeout(timeoutRef.current)
@@ -63,7 +55,6 @@ export function useAdvancedDebounce<T>(
         value,
         debouncedValue,
         isDebouncing,
-        flush,
         cancel,
         reset
     }

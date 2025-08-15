@@ -1,16 +1,17 @@
-import { Link } from 'react-router'
+import { Link, useSearchParams } from 'react-router'
 import type { Recipe } from '../features/search/search-types'
 import { motion } from 'framer-motion'
 import { useParallax } from '../hooks/use-parallax'
 import { useAnimationPrefs } from '../contexts/AnimationContext'
 import { useSafeAnimations } from '../hooks/use-safe-animations'
-import type { HTMLAttributes } from 'react'
+import { useMemo, type HTMLAttributes } from 'react'
 
 type RecipeCardProps = {
-	recipe: Recipe
+	recipe: Recipe,
+	searchParams?: URLSearchParams
 } & HTMLAttributes<HTMLDivElement>
 
-export function RecipeCard({ recipe, ...props }: RecipeCardProps) {
+export function RecipeCard({ recipe, searchParams, ...props }: RecipeCardProps) {
 	const { prefersReducedMotion } = useAnimationPrefs()
 	const { ref, transform, handleMouseMove, handleMouseLeave } = useParallax({
 		pitchFactor: 10,
@@ -27,6 +28,13 @@ export function RecipeCard({ recipe, ...props }: RecipeCardProps) {
 
 	const { getNoMotionOverride } = useSafeAnimations()
 
+	const recipeLink = useMemo(() => {
+		if (searchParams) {
+			return `/recipe/${recipe.id}?${searchParams.toString()}`
+		}
+		return `/recipe/${recipe.id}`
+	}, [recipe.id, searchParams])
+
 	return (
 		<motion.div
 			ref={ref}
@@ -40,7 +48,7 @@ export function RecipeCard({ recipe, ...props }: RecipeCardProps) {
 			{...parallaxHandlers}
 		>
 			<Link
-				to={`/recipe/${recipe.id}`}
+				to={recipeLink}
 				className='block p-4'
 			>
 				<div className='flex items-start gap-4'>
