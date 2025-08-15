@@ -1,10 +1,10 @@
-import { useEffect } from 'react'
-import { useState } from 'react'
-import { getRandomRecipeIdea } from '../data/ideas'
+import { useEffect } from 'react';
+import { useState } from 'react';
+import { getRandomRecipeIdea } from '../data/ideas';
 
 export const useAnimatedRecipeIdea = (intervalMs = 2000) => {
-	const [recipeIdea, setRecipeIdea] = useState(getRandomRecipeIdea())
-	const [color, setColor] = useState('#4F86F7')
+	const [recipeIdea, setRecipeIdea] = useState(getRandomRecipeIdea());
+	const [color, setColor] = useState('#4F86F7');
 
 	const generateRandomColor = () => {
 		const colors = [
@@ -24,19 +24,19 @@ export const useAnimatedRecipeIdea = (intervalMs = 2000) => {
 			'#FFD740',
 			'#FFAB40',
 			'#FF6E40',
-		]
+		];
 
-		return colors[Math.floor(Math.random() * colors.length)]
-	}
+		return colors[Math.floor(Math.random() * colors.length)];
+	};
 
 	useEffect(() => {
 		const interval = setInterval(() => {
-			setRecipeIdea(getRandomRecipeIdea())
-			setColor(generateRandomColor())
-		}, intervalMs)
+			setRecipeIdea(getRandomRecipeIdea());
+			setColor(generateRandomColor());
+		}, intervalMs);
 
-		return () => clearInterval(interval)
-	}, [intervalMs])
+		return () => clearInterval(interval);
+	}, [intervalMs]);
 
-	return { recipeIdea, color }
-}
+	return { recipeIdea, color };
+};

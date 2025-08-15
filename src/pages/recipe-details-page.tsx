@@ -1,33 +1,37 @@
-import { useParams, Link, useOutletContext, useSearchParams } from 'react-router'
-import { motion } from 'framer-motion'
-import { useEffect } from 'react'
-import { useAnimationPrefs } from '../contexts/AnimationContext'
-import { CustomLoader } from '../components/ui/CustomLoader'
-import type { GlobalSearchAPI } from '../features/search/search-types'
-import { useSearchFeature } from '../features/search/hooks/use-search'
+import {
+	useParams,
+	Link,
+	useOutletContext,
+	useSearchParams,
+} from 'react-router';
+import { motion } from 'framer-motion';
+import { useEffect } from 'react';
+import { useAnimationPrefs } from '../contexts/animation-context';
+import { CustomLoader } from '../components/ui/custom-loader';
+import type { GlobalSearchAPI } from '../features/search/search-types';
+import { useSearchFeature } from '../features/search/hooks/use-search';
 
 interface RecipeDetailsProps {
-	search: GlobalSearchAPI
+	search: GlobalSearchAPI;
 }
 
 export default function RecipeDetails() {
-	const { id } = useParams()
+	const { id } = useParams();
 
-	const { prefersReducedMotion } = useAnimationPrefs()
-	const [searchParams] = useSearchParams()
+	const { prefersReducedMotion } = useAnimationPrefs();
+	const [searchParams] = useSearchParams();
 
-	const { useRecipeDetails } = useSearchFeature()
+	const { useRecipeDetails } = useSearchFeature();
 
-	const { search } = useOutletContext<RecipeDetailsProps>()
-	const { recipe, loading, error, searchByID } = useRecipeDetails()
+	const { search } = useOutletContext<RecipeDetailsProps>();
+	const { recipe, loading, error, searchByID } = useRecipeDetails();
 
 	useEffect(() => {
-		searchByID(Number(id))
-	}, [])
-
+		searchByID(Number(id));
+	}, []);
 
 	if (loading) {
-		return <CustomLoader />
+		return <CustomLoader />;
 	}
 
 	if (error || !recipe) {
@@ -43,7 +47,7 @@ export default function RecipeDetails() {
 					Return to search
 				</Link>
 			</div>
-		)
+		);
 	}
 
 	const healthLabels = [
@@ -54,7 +58,7 @@ export default function RecipeDetails() {
 			recipe.glutenFree ? 'Gluten-Free' : null,
 			recipe.dairyFree ? 'Dairy-Free' : null,
 		].filter(Boolean),
-	]
+	];
 
 	return (
 		<motion.div
@@ -135,12 +139,12 @@ export default function RecipeDetails() {
 							<h2 className='text-xl font-semibold mb-2'>Health Information</h2>
 							<div className='flex flex-wrap gap-2'>
 								{healthLabels.map((label: string | null, i: number) => {
-									if (!label) return null
+									if (!label) return null;
 
 									const capitalizedLabel = label
 										.split(' ')
 										.map(word => word.charAt(0).toUpperCase() + word.slice(1))
-										.join(' ')
+										.join(' ');
 
 									return (
 										<span
@@ -149,7 +153,7 @@ export default function RecipeDetails() {
 										>
 											{capitalizedLabel}
 										</span>
-									)
+									);
 								})}
 							</div>
 						</div>
@@ -173,7 +177,7 @@ export default function RecipeDetails() {
 									const capitalizedName = ingredient.name
 										.split(' ')
 										.map(word => word.charAt(0).toUpperCase() + word.slice(1))
-										.join(' ')
+										.join(' ');
 
 									return (
 										<li
@@ -185,7 +189,7 @@ export default function RecipeDetails() {
 												alt={capitalizedName}
 												className='w-10 h-10 object-cover rounded mr-3 mt-1'
 												onError={e => {
-													e.currentTarget.src = 'http://placehold.co/100x100'
+													e.currentTarget.src = 'http://placehold.co/100x100';
 												}}
 											/>
 											<div>
@@ -195,7 +199,7 @@ export default function RecipeDetails() {
 												</span>
 											</div>
 										</li>
-									)
+									);
 								})}
 							</ul>
 						</div>
@@ -268,7 +272,7 @@ export default function RecipeDetails() {
 																</div>
 															)}
 													</li>
-												)
+												);
 											})}
 										</ol>
 									</div>
@@ -309,5 +313,5 @@ export default function RecipeDetails() {
 				</div>
 			</div>
 		</motion.div>
-	)
+	);
 }

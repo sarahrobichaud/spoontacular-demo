@@ -1,7 +1,7 @@
-import { useAnimationPrefs } from '../contexts/AnimationContext'
+import { useAnimationPrefs } from '../contexts/animation-context';
 
 export function useSafeAnimations() {
-	const { prefersReducedMotion } = useAnimationPrefs()
+	const { prefersReducedMotion } = useAnimationPrefs();
 
 	// Return animation properties based on preferences
 	return {
@@ -17,5 +17,5 @@ export function useSafeAnimations() {
 		getNoMotionOverride: () => (prefersReducedMotion ? 'no-motion' : ''),
 
 		prefersReducedMotion,
-	}
+	};
 }

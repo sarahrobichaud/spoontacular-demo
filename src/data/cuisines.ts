@@ -26,4 +26,4 @@ export const AVAILABLE_CUISINES = [
 	'Spanish',
 	'Thai',
 	'Vietnamese',
-]
+];

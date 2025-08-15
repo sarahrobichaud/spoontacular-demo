@@ -1,39 +1,43 @@
-import { Link, useSearchParams } from 'react-router'
-import type { Recipe } from '../features/search/search-types'
-import { motion } from 'framer-motion'
-import { useParallax } from '../hooks/use-parallax'
-import { useAnimationPrefs } from '../contexts/AnimationContext'
-import { useSafeAnimations } from '../hooks/use-safe-animations'
-import { useMemo, type HTMLAttributes } from 'react'
+import { Link } from 'react-router';
+import type { Recipe } from '../../features/search/search-types';
+import { motion } from 'framer-motion';
+import { useParallax } from '../../hooks/use-parallax';
+import { useAnimationPrefs } from '../../contexts/animation-context';
+import { useSafeAnimations } from '../../hooks/use-safe-animations';
+import { useMemo, type HTMLAttributes } from 'react';
 
 type RecipeCardProps = {
-	recipe: Recipe,
-	searchParams?: URLSearchParams
-} & HTMLAttributes<HTMLDivElement>
+	recipe: Recipe;
+	searchParams?: URLSearchParams;
+} & HTMLAttributes<HTMLDivElement>;
 
-export function RecipeCard({ recipe, searchParams, ...props }: RecipeCardProps) {
-	const { prefersReducedMotion } = useAnimationPrefs()
+export function RecipeCard({
+	recipe,
+	searchParams,
+	...props
+}: RecipeCardProps) {
+	const { prefersReducedMotion } = useAnimationPrefs();
 	const { ref, transform, handleMouseMove, handleMouseLeave } = useParallax({
 		pitchFactor: 10,
 		yawFactor: 15,
 		perspective: 1200,
-	})
+	});
 
 	const parallaxHandlers = prefersReducedMotion
 		? {}
 		: {
 			onMouseMove: handleMouseMove,
 			onMouseLeave: handleMouseLeave,
-		}
+		};
 
-	const { getNoMotionOverride } = useSafeAnimations()
+	const { getNoMotionOverride } = useSafeAnimations();
 
 	const recipeLink = useMemo(() => {
 		if (searchParams) {
-			return `/recipe/${recipe.id}?${searchParams.toString()}`
+			return `/recipe/${recipe.id}?${searchParams.toString()}`;
 		}
-		return `/recipe/${recipe.id}`
-	}, [recipe.id, searchParams])
+		return `/recipe/${recipe.id}`;
+	}, [recipe.id, searchParams]);
 
 	return (
 		<motion.div
@@ -59,7 +63,7 @@ export function RecipeCard({ recipe, searchParams, ...props }: RecipeCardProps) 
 							className='w-24 h-24 object-cover rounded-md'
 							loading='lazy'
 							onError={e => {
-								e.currentTarget.src = 'http://placehold.co/200x200'
+								e.currentTarget.src = 'http://placehold.co/200x200';
 							}}
 						/>
 					</div>
@@ -73,5 +77,5 @@ export function RecipeCard({ recipe, searchParams, ...props }: RecipeCardProps) 
 				</div>
 			</Link>
 		</motion.div>
-	)
+	);
 }

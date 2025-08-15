@@ -1,88 +1,83 @@
-import { createBrowserRouter, Outlet, RouterProvider } from 'react-router'
-import DefaultLayout from './layouts/Default'
-import RecipeDetails from './pages/RecipeDetails'
-import ErrorPage from './pages/ErrorPage'
-import { ApiKeyForm } from './components/ApiKeyForm'
-import { ApiKeyProvider, useApiKey } from './contexts/ApiKeyContext'
+import { createBrowserRouter, Outlet, RouterProvider } from 'react-router';
+import DefaultLayout from './layouts/default-layout';
+import RecipeDetails from './pages/recipe-details-page';
+import ErrorPage from './pages/error-page';
+import { AppProvider } from './contexts/app-provider';
+import SearchPage from './pages/result-page';
+import HomePage from './pages/home-page';
 
-import './styles/globals.css'
-import './styles/tailwind.css'
-import { AppProvider } from './contexts/AppProvider'
-import SearchPage from './pages/result-page'
-import HomePage from './pages/home-page'
+import './styles/globals.css';
+import './styles/tailwind.css';
+import AuthLayout from './layouts/auth-layout';
+import { ProtectedRoute } from './layouts/protected-route';
 
 const AppContent = () => {
-	const { apiKey, isLoaded } = useApiKey()
-
-	if (!isLoaded) {
+	const renderDefaultLayout = () => {
 		return (
-			<div className='min-h-screen flex items-center justify-center'>
-				Loading...
-			</div>
-		)
-	}
-
-	const defaultElement = (
-		<AppProvider>
-			<DefaultLayout>
-				<Outlet />
-			</DefaultLayout>
-		</AppProvider>
-	)
-
-	const errorElement = (
-		<AppProvider>
+			<ProtectedRoute>
+				<DefaultLayout>
+					<Outlet />
+				</DefaultLayout>
+			</ProtectedRoute>
+		);
+	};
+	const displayErrorPage = () => {
+		return (
 			<DefaultLayout>
 				<ErrorPage />
 			</DefaultLayout>
-		</AppProvider>
-	)
+		);
+	};
 
 	const router = createBrowserRouter([
 		{
+			path: '/setup',
+			element: <AuthLayout />,
+		},
+		{
 			path: '/recipe/:id',
-			element: defaultElement,
-			errorElement: errorElement,
+			element: renderDefaultLayout(),
+			errorElement: displayErrorPage(),
 			children: [
 				{
 					index: true,
-					element: apiKey ? <RecipeDetails /> : <ApiKeyForm />,
+					element: <RecipeDetails />,
 				},
 			],
 		},
 		{
 			path: '/search',
-			element: defaultElement,
-			errorElement: errorElement,
+			element: renderDefaultLayout(),
+			errorElement: displayErrorPage(),
 			children: [
 				{
 					index: true,
-					element: apiKey ? <SearchPage /> : <ApiKeyForm />,
+					element: <SearchPage />,
 				},
 			],
 		},
 		{
 			path: '/',
-			element: defaultElement,
-			errorElement: errorElement,
+			element: renderDefaultLayout(),
+			errorElement: displayErrorPage(),
 			children: [
 				{
 					index: true,
-					element: apiKey ? <HomePage /> : <ApiKeyForm />,
+					element: <HomePage />,
 				},
 			],
 		},
-	])
+	]);
 
-	return <RouterProvider router={router} />
-}
+	return <RouterProvider router={router} />;
+};
 
 function App() {
 	return (
-		<ApiKeyProvider>
+		<AppProvider>
 			<AppContent />
-		</ApiKeyProvider>
-	)
+		</AppProvider>
+	);
 }
 
-export default App
+export default App;

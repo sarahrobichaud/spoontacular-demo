@@ -1,61 +1,63 @@
-import { useState } from 'react'
-import { useDebounce } from '../../../hooks/use-debounce'
+import { useState } from 'react';
+import { useDebounce } from '../../../hooks/use-debounce';
 
 export type PaginationInfo = {
 	// Metadata
-	currentPage: number
-	activePage: number
-	pendingPageChange: boolean
-	totalPages: number
-	canGoToNextPage: boolean
-	canGoToPreviousPage: boolean
-	offset: number
-	totalResults: number
-	isAvailable: boolean
+	currentPage: number;
+	activePage: number;
+	pendingPageChange: boolean;
+	totalPages: number;
+	canGoToNextPage: boolean;
+	canGoToPreviousPage: boolean;
+	offset: number;
+	totalResults: number;
+	isAvailable: boolean;
 
 	// Public API
-	handleNextPage: () => void
-	handlePreviousPage: () => void
-	reset: () => void
-}
+	handleNextPage: () => void;
+	handlePreviousPage: () => void;
+	reset: () => void;
+};
 
 export interface PaginationOptions {
-	pageSize: number
-	totalResults: number
-	defaultPage: number
+	pageSize: number;
+	totalResults: number;
+	defaultPage: number;
 }
 
-export function usePagination(
-	{ pageSize, totalResults, defaultPage }: PaginationOptions
-): PaginationInfo {
-	const [currentPage, setCurrentPage] = useState(defaultPage)
+export function usePagination({
+	pageSize,
+	totalResults,
+	defaultPage,
+}: PaginationOptions): PaginationInfo {
+	const [currentPage, setCurrentPage] = useState(defaultPage);
 
-	const [activePage, pendingPageChange, resetActivePage] = useDebounce(
-		currentPage,
-		1000
-	)
+	const {
+		debouncedValue: activePage,
+		isDebouncing: pendingPageChange,
+		reset: resetActivePage,
+	} = useDebounce(currentPage, 1000);
 
-	const offset = (currentPage - 1) * pageSize
+	const offset = (currentPage - 1) * pageSize;
 
-	const totalPages = Math.ceil(totalResults / pageSize)
+	const totalPages = Math.ceil(totalResults / pageSize);
 
 	const handleNextPage = () => {
-		setCurrentPage(currentPage + 1)
-	}
+		setCurrentPage(currentPage + 1);
+	};
 
 	const handlePreviousPage = () => {
-		setCurrentPage(currentPage - 1)
-	}
+		setCurrentPage(currentPage - 1);
+	};
 
-	const canGoToNextPage = currentPage < totalPages
+	const canGoToNextPage = currentPage < totalPages;
 
-	const canGoToPreviousPage = currentPage > 1
+	const canGoToPreviousPage = currentPage > 1;
 
 	const reset = () => {
-		setCurrentPage(1)
-		resetActivePage(1)
-	}
-
+		setCurrentPage(1);
+		resetActivePage(1);
+	};
 
 	return {
 		currentPage,
@@ -70,5 +72,5 @@ export function usePagination(
 		handlePreviousPage,
 		offset,
 		totalResults,
-	}
+	};
 }

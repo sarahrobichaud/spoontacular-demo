@@ -1,9 +1,9 @@
-import { useIsMobile } from '../../hooks/use-mobile'
-import { useApiKey } from '../../contexts/ApiKeyContext'
-import { TrashIcon } from 'lucide-react'
+import { useIsMobile } from '../../hooks/use-mobile';
+import { useApiKey } from '../../contexts/api-key-context';
+import { TrashIcon } from 'lucide-react';
 export default function Footer() {
-	const isMobile = useIsMobile()
-	const { clearApiKey, apiKey } = useApiKey()
+	const isMobile = useIsMobile();
+	const { clearApiKey, apiKey } = useApiKey();
 	return (
 		<footer
 			className={`py-6 bg-black/50 border-t-2 border-gray-300/10 ${isMobile ? 'mb-[100px]' : ''}`}
@@ -33,5 +33,5 @@ export default function Footer() {
 				</p>
 			</div>
 		</footer>
-	)
+	);
 }

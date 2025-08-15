@@ -1,13 +1,13 @@
-import { motion } from 'framer-motion'
-import { useAnimatedRecipeIdea } from '../hooks/use-animated-recipe-idea'
-import { useAnimationPrefs } from '../contexts/AnimationContext'
-import { AnimatePresence } from 'framer-motion'
-import { useIsMobile } from '../hooks/use-mobile'
+import { motion } from 'framer-motion';
+import { useAnimatedRecipeIdea } from '../../hooks/use-animated-recipe-idea';
+import { useAnimationPrefs } from '../../contexts/animation-context';
+import { AnimatePresence } from 'framer-motion';
+import { useIsMobile } from '../../hooks/use-mobile';
 
 export default function RecipeIdeasPrompt() {
-	const { recipeIdea, color } = useAnimatedRecipeIdea()
-	const isMobile = useIsMobile()
-	const { prefersReducedMotion } = useAnimationPrefs()
+	const { recipeIdea, color } = useAnimatedRecipeIdea();
+	const isMobile = useIsMobile();
+	const { prefersReducedMotion } = useAnimationPrefs();
 
 	return (
 		<motion.div
@@ -51,5 +51,5 @@ export default function RecipeIdeasPrompt() {
 				</p>
 			</div>
 		</motion.div>
-	)
+	);
 }

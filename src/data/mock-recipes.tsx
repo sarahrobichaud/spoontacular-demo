@@ -1,6 +1,6 @@
 // Mock data for development
 
-import type { DetailedRecipe } from '../features/search/search-types'
+import type { DetailedRecipe } from '../features/search/search-types';
 
 export const mockDetailedRecipe: DetailedRecipe = {
 	id: 1,
@@ -199,7 +199,7 @@ export const mockDetailedRecipe: DetailedRecipe = {
 	vegan: false,
 	glutenFree: false,
 	dairyFree: false,
-}
+};
 export const mockRecipes = [
 	{
 		id: 1,
@@ -561,4 +561,4 @@ export const mockRecipes = [
 		spoonacularScore: 84,
 		healthScore: 70,
 	},
-]
+];

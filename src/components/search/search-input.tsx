@@ -1,26 +1,20 @@
-import type { FormEvent, HTMLAttributes } from 'react'
-import type { GlobalSearchAPI } from '../../features/search/search-types'
+import type { FormEvent, HTMLAttributes } from 'react';
+import type { GlobalSearchAPI } from '../../features/search/search-types';
 
 interface SearchInputProps extends HTMLAttributes<HTMLFormElement> {
-	search: GlobalSearchAPI
-	onSearch?: () => Promise<void>
+	search: GlobalSearchAPI;
+	onSearch?: () => Promise<void>;
 }
 
-export function SearchInput({
-	search,
-	onSearch,
-	...props
-}: SearchInputProps) {
-
+export function SearchInput({ search, onSearch, ...props }: SearchInputProps) {
 	const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
-		e.preventDefault()
-		console.log('handleSubmit', onSearch)
+		e.preventDefault();
 		if (onSearch) {
-			await onSearch()
+			await onSearch();
 		} else {
-			search.executeSearch()
+			search.executeSearch();
 		}
-	}
+	};
 
 	return (
 		<form
@@ -60,5 +54,5 @@ export function SearchInput({
 				</button>
 			</div>
 		</form>
-	)
+	);
 }

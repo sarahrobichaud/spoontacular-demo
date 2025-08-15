@@ -59,12 +59,12 @@ export const recipeIdeas = [
 	'seafood paella',
 	'vegetable spring rolls',
 	'chicken caesar salad',
-]
+];
 
 export const getRandomRecipeIdea = (): string => {
-	const randomIndex = Math.floor(Math.random() * recipeIdeas.length)
+	const randomIndex = Math.floor(Math.random() * recipeIdeas.length);
 	return recipeIdeas[randomIndex]
 		.split(' ')
 		.map(word => word.charAt(0).toUpperCase() + word.slice(1))
-		.join(' ')
-}
+		.join(' ');
+};

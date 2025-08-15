@@ -1,20 +1,22 @@
-import { motion } from 'framer-motion'
-import { useAnimationPrefs } from '../contexts/AnimationContext'
-import { CuisineSelector } from './CuisideSelector'
-import { SearchInput } from './ui/SearchInput'
-import type { GlobalSearchAPI } from '../features/search/search-types'
-import { useNavigate } from 'react-router'
+import { motion } from 'framer-motion';
+import { useAnimationPrefs } from '../../contexts/animation-context';
+import { CuisineSelector } from './cuisine-selector';
+import { SearchInput } from './search-input';
+import type { GlobalSearchAPI } from '../../features/search/search-types';
+import { useNavigate } from 'react-router';
 
 interface SearchComponentProps {
-	search: GlobalSearchAPI
+	search: GlobalSearchAPI;
 }
 
 export function SearchComponent({ search }: SearchComponentProps) {
-	const prefersReducedMotion = useAnimationPrefs()
-	const navigate = useNavigate()
+	const prefersReducedMotion = useAnimationPrefs();
+	const navigate = useNavigate();
 	const onSearch = async () => {
-		await navigate(`/search?query=${search.query}&cuisines=${search.cuisinesStringParam}`)
-	}
+		await navigate(
+			`/search?query=${search.query}&cuisines=${search.cuisinesStringParam}`
+		);
+	};
 
 	return (
 		<motion.div
@@ -43,5 +45,5 @@ export function SearchComponent({ search }: SearchComponentProps) {
 				</div>
 			</div>
 		</motion.div>
-	)
+	);
 }

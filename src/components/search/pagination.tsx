@@ -1,10 +1,10 @@
-import { LoaderCircle } from 'lucide-react'
-import type { PaginationInfo } from '../../features/search/hooks/use-result-pagination'
-import type { HTMLAttributes } from 'react'
+import { LoaderCircle } from 'lucide-react';
+import type { PaginationInfo } from '../../features/search/hooks/use-result-pagination';
+import type { HTMLAttributes } from 'react';
 
 export type PaginationProps = {
-	pagination: PaginationInfo
-} & HTMLAttributes<HTMLDivElement>
+	pagination: PaginationInfo;
+} & HTMLAttributes<HTMLDivElement>;
 
 export function Pagination({ pagination, ...props }: PaginationProps) {
 	return (
@@ -36,5 +36,5 @@ export function Pagination({ pagination, ...props }: PaginationProps) {
 				</button>
 			</div>
 		</div>
-	)
+	);
 }

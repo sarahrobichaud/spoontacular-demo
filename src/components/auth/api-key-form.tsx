@@ -1,22 +1,22 @@
-import { useState } from 'react'
-import { useApiKey } from '../contexts/ApiKeyContext'
+import { useState } from 'react';
+import { useApiKey } from '../../contexts/api-key-context';
 
 export function ApiKeyForm() {
-	const [inputKey, setInputKey] = useState('')
-	const [error, setError] = useState('')
-	const { setApiKey } = useApiKey()
+	const [inputKey, setInputKey] = useState('');
+	const [error, setError] = useState('');
+	const { setApiKey } = useApiKey();
 
 	const handleSubmit = (e: React.FormEvent) => {
-		e.preventDefault()
+		e.preventDefault();
 
 		if (!inputKey.trim()) {
-			setError('Please enter a valid API key')
-			return
+			setError('Please enter a valid API key');
+			return;
 		}
 
-		setApiKey(inputKey.trim())
-		setError('')
-	}
+		setApiKey(inputKey.trim());
+		setError('');
+	};
 
 	return (
 		<div className='flex flex-col items-center justify-center p-4'>
@@ -65,5 +65,5 @@ export function ApiKeyForm() {
 				</div>
 			</div>
 		</div>
-	)
+	);
 }

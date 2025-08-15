@@ -1,8 +1,8 @@
-import { LoaderCircle } from 'lucide-react'
-import { useAnimationPrefs } from '../../contexts/AnimationContext'
+import { LoaderCircle } from 'lucide-react';
+import { useAnimationPrefs } from '../../contexts/animation-context';
 
 export function CustomLoader() {
-	const { prefersReducedMotion } = useAnimationPrefs()
+	const { prefersReducedMotion } = useAnimationPrefs();
 
 	return (
 		<div className='flex items-center justify-center py-12 w-full'>
@@ -14,5 +14,5 @@ export function CustomLoader() {
 				/>
 			)}
 		</div>
-	)
+	);
 }

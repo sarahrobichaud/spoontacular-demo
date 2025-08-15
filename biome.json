@@ -56,7 +56,7 @@
 			"trailingCommas": "es5",
 			"bracketSpacing": true,
 			"lineWidth": 80,
-			"semicolons": "asNeeded",
+			"semicolons": "always",
 			"jsxQuoteStyle": "single",
 			"attributePosition": "multiline",
 			"quoteProperties": "asNeeded",

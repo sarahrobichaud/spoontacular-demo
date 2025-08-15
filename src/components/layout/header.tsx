@@ -1,42 +1,42 @@
-import { AnimatePresence, motion } from 'framer-motion'
-import { useIsMobile } from '../../hooks/use-mobile'
-import { useAnimationPrefs } from '../../contexts/AnimationContext'
-import { useSafeAnimations } from '../../hooks/use-safe-animations'
-import { SearchInput } from '../ui/SearchInput'
-import { Sparkles, TrashIcon } from 'lucide-react'
-import { useApiKey } from '../../contexts/ApiKeyContext'
-import type { GlobalSearchAPI } from '../../features/search/search-types'
-import { useLocation, useNavigate } from 'react-router'
+import { AnimatePresence, motion } from 'framer-motion';
+import { useIsMobile } from '../../hooks/use-mobile';
+import { useAnimationPrefs } from '../../contexts/animation-context';
+import { useSafeAnimations } from '../../hooks/use-safe-animations';
+import { SearchInput } from '../search/search-input';
+import { Sparkles, TrashIcon } from 'lucide-react';
+import { useApiKey } from '../../contexts/api-key-context';
+import type { GlobalSearchAPI } from '../../features/search/search-types';
+import { useLocation, useNavigate } from 'react-router';
 
 interface HeaderProps {
-	search: GlobalSearchAPI
+	search: GlobalSearchAPI;
 }
 
 export default function Header({ search }: HeaderProps) {
-	const location = useLocation()
+	const location = useLocation();
 	const navigate = useNavigate();
 
-	const isMobile = useIsMobile()
-	const { apiKey, clearApiKey } = useApiKey()
-	const { prefersReducedMotion, toggleReducedMotion } = useAnimationPrefs()
+	const isMobile = useIsMobile();
+	const { apiKey, clearApiKey } = useApiKey();
+	const { prefersReducedMotion, toggleReducedMotion } = useAnimationPrefs();
 
-	const { getNoMotionOverride } = useSafeAnimations()
+	const { getNoMotionOverride } = useSafeAnimations();
 
-	const displaySearch = location.pathname !== '/'
+	const displaySearch = location.pathname !== '/' && apiKey;
 
 	const onSearch = async () => {
 		if (location.pathname !== '/search') {
-			void await navigate(`/search?query=${search.query}&cuisines=${search.cuisinesStringParam}`)
+			void (await navigate(
+				`/search?query=${search.query}&cuisines=${search.cuisinesStringParam}`
+			));
 		}
-		search.executeSearch()
-	}
+		search.executeSearch();
+	};
 
 	return (
 		<>
 			{isMobile && displaySearch && (
-				<div
-					className='fixed bottom-0 left-0 right-0 container mx-auto px-4 bg-black z-10 py-4 border-t-2 border-gray-300/10 min-h-[100px]'
-				>
+				<div className='fixed bottom-0 left-0 right-0 container mx-auto px-4 bg-black z-10 py-4 border-t-2 border-gray-300/10 min-h-[100px]'>
 					<div className=''>
 						<SearchInput
 							className='text-[16px]'
@@ -117,5 +117,5 @@ export default function Header({ search }: HeaderProps) {
 				</div>
 			</header>
 		</>
-	)
+	);
 }

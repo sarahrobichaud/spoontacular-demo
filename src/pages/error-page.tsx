@@ -1,20 +1,20 @@
-import { useRouteError, isRouteErrorResponse, Link } from 'react-router'
+import { useRouteError, isRouteErrorResponse, Link } from 'react-router';
 
 export default function ErrorPage() {
-	const error = useRouteError()
+	const error = useRouteError();
 
-	let errorMessage = 'An unexpected error occurred'
-	let statusText = ''
-	let status = ''
+	let errorMessage = 'An unexpected error occurred';
+	let statusText = '';
+	let status = '';
 
 	if (isRouteErrorResponse(error)) {
-		status = error.status.toString()
-		statusText = error.statusText
+		status = error.status.toString();
+		statusText = error.statusText;
 		errorMessage =
 			error.data?.message ||
-			"Sorry, this page doesn't exist or an error occurred"
+			"Sorry, this page doesn't exist or an error occurred";
 	} else if (error instanceof Error) {
-		errorMessage = error.message
+		errorMessage = error.message;
 	}
 
 	return (
@@ -42,5 +42,5 @@ export default function ErrorPage() {
 				</div>
 			</div>
 		</div>
-	)
+	);
 }

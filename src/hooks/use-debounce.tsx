@@ -1,35 +1,58 @@
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react';
 
-export function useDebounce<T>(
-	value: T,
-	delay = 500
-): [T, boolean, (newValue: T) => void] {
-	const [comparedValue, setComparedValue] = useState<T>(value)
-	const [debouncedValue, setDebouncedValue] = useState<T>(value)
+export interface DebounceResult<T> {
+	value: T;
+	debouncedValue: T;
+	isDebouncing: boolean;
+	cancel: () => void;
+	reset: (newValue: T) => void;
+}
+
+export function useDebounce<T>(value: T, delay = 500): DebounceResult<T> {
+	const [debouncedValue, setDebouncedValue] = useState<T>(value);
+	const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+	const valueRef = useRef<T>(value);
+
+	const isDebouncing = value !== debouncedValue;
 
 	useEffect(() => {
-		setComparedValue(value)
-	}, [value])
+		valueRef.current = value;
 
-	useEffect(() => {
-		const handler = setTimeout(() => {
-			setDebouncedValue(value)
-			setComparedValue(value)
-		}, delay)
+		if (timeoutRef.current) {
+			clearTimeout(timeoutRef.current);
+		}
+
+		timeoutRef.current = setTimeout(() => {
+			setDebouncedValue(valueRef.current);
+		}, delay);
 
 		return () => {
-			clearTimeout(handler)
+			if (timeoutRef.current) {
+				clearTimeout(timeoutRef.current);
+			}
+		};
+	}, [value, delay]);
+
+	const cancel = useCallback(() => {
+		if (timeoutRef.current) {
+			clearTimeout(timeoutRef.current);
 		}
-	}, [value, delay])
+		setDebouncedValue(value);
+	}, [value]);
 
-	const same = useMemo(() => {
-		return comparedValue === debouncedValue
-	}, [comparedValue, debouncedValue])
+	const reset = useCallback((newValue: T) => {
+		if (timeoutRef.current) {
+			clearTimeout(timeoutRef.current);
+		}
+		valueRef.current = newValue;
+		setDebouncedValue(newValue);
+	}, []);
 
-	const reset = (newValue: T) => {
-		setDebouncedValue(newValue)
-		setComparedValue(newValue)
-	}
-
-	return [debouncedValue, !same, reset]
+	return {
+		value,
+		debouncedValue,
+		isDebouncing,
+		cancel,
+		reset,
+	};
 }

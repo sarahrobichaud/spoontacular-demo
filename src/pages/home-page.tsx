@@ -1,8 +1,8 @@
-import { useOutletContext } from "react-router";
-import { SearchComponent } from "../components/SearchComponent";
-import type { GlobalSearchAPI } from "../features/search/search-types";
+import { useOutletContext } from 'react-router';
+import { SearchComponent } from '../components/search/search-component';
+import type { GlobalSearchAPI } from '../features/search/search-types';
 
 export default function HomePage() {
-    const { search } = useOutletContext<{ search: GlobalSearchAPI }>()
-    return <SearchComponent search={search} />
+	const { search } = useOutletContext<{ search: GlobalSearchAPI }>();
+	return <SearchComponent search={search} />;
 }
