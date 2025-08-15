@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
-import { useDebounce } from '../../../hooks/use-debounce';
-import type { CuisineSelection } from '../search-types';
+import { useDebounce } from '../use-debounce';
+import type { CuisineSelection } from '../../types/search-types';
 
 export function useCuisineSelection(debounceMs = 500): CuisineSelection {
 	const [cuisines, setCuisines] = useState<string[]>([]);

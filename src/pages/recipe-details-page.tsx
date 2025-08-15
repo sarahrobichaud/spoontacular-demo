@@ -1,14 +1,10 @@
-import {
-	useParams,
-	useOutletContext,
-	useSearchParams,
-} from 'react-router';
+import { useParams, useOutletContext, useSearchParams } from 'react-router';
 import { motion } from 'framer-motion';
 import { useEffect } from 'react';
 import { useAnimationPrefs } from '../contexts/animation-context';
 import { CustomLoader } from '../components/ui/custom-loader';
-import type { GlobalSearchAPI } from '../features/search/search-types';
-import { useSearchFeature } from '../features/search/hooks/use-search';
+import type { GlobalSearchAPI } from '../types/search-types';
+import { useSearchFeature } from '../hooks/search/use-search';
 
 // Import the new child components
 import { RecipeBackButton } from '../components/recipes/recipe-back-button';
@@ -46,7 +42,10 @@ export default function RecipeDetails() {
 				<h2 className='text-xl font-semibold mb-4'>
 					{error ? `Error loading recipe: ${error}` : 'Recipe not found'}
 				</h2>
-				<RecipeBackButton search={search} searchParams={searchParams} />
+				<RecipeBackButton
+					search={search}
+					searchParams={searchParams}
+				/>
 			</div>
 		);
 	}
@@ -58,14 +57,19 @@ export default function RecipeDetails() {
 			exit={prefersReducedMotion ? {} : { opacity: 0 }}
 			transition={prefersReducedMotion ? { duration: 0 } : { duration: 0.3 }}
 		>
-			<RecipeBackButton search={search} searchParams={searchParams} />
+			<RecipeBackButton
+				search={search}
+				searchParams={searchParams}
+			/>
 
 			<div className='bg-black/10 border-2 border-gray-300/10 rounded-lg shadow-lg overflow-hidden'>
 				<motion.div
 					initial={prefersReducedMotion ? {} : { opacity: 0, y: -100 }}
 					animate={prefersReducedMotion ? {} : { opacity: 1, y: 0 }}
 					exit={prefersReducedMotion ? {} : { opacity: 0, y: 0 }}
-					transition={prefersReducedMotion ? { duration: 0 } : { duration: 0.3 }}
+					transition={
+						prefersReducedMotion ? { duration: 0 } : { duration: 0.3 }
+					}
 				>
 					<RecipeHeader recipe={recipe} />
 				</motion.div>
@@ -74,23 +78,29 @@ export default function RecipeDetails() {
 					initial={prefersReducedMotion ? {} : { opacity: 0, y: 100 }}
 					animate={prefersReducedMotion ? {} : { opacity: 1, y: 0 }}
 					exit={prefersReducedMotion ? {} : { opacity: 0, y: 0 }}
-					transition={prefersReducedMotion ? { duration: 0 } : { duration: 0.3 }}
+					transition={
+						prefersReducedMotion ? { duration: 0 } : { duration: 0.3 }
+					}
 				>
 					<div className='p-6'>
 						<motion.div
 							initial={prefersReducedMotion ? {} : { opacity: 0, y: 50 }}
 							animate={prefersReducedMotion ? {} : { opacity: 1, y: 0 }}
 							exit={prefersReducedMotion ? {} : { opacity: 0, y: 0 }}
-							transition={prefersReducedMotion ? { duration: 0 } : { duration: 0.3 }}
+							transition={
+								prefersReducedMotion ? { duration: 0 } : { duration: 0.3 }
+							}
 						>
 							<RecipeMetrics recipe={recipe} />
 						</motion.div>
 						<RecipeHealthLabels recipe={recipe} />
 						<motion.div
-							initial={prefersReducedMotion ? {} : { opacity: 0, }}
-							animate={prefersReducedMotion ? {} : { opacity: 1, }}
+							initial={prefersReducedMotion ? {} : { opacity: 0 }}
+							animate={prefersReducedMotion ? {} : { opacity: 1 }}
 							exit={prefersReducedMotion ? {} : { opacity: 0, y: 0 }}
-							transition={prefersReducedMotion ? { duration: 0 } : { duration: 1 }}
+							transition={
+								prefersReducedMotion ? { duration: 0 } : { duration: 1 }
+							}
 						>
 							<RecipeSummary recipe={recipe} />
 						</motion.div>
@@ -100,6 +110,6 @@ export default function RecipeDetails() {
 					</div>
 				</motion.div>
 			</div>
-		</motion.div >
+		</motion.div>
 	);
 }

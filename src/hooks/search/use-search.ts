@@ -10,9 +10,9 @@ import type {
 	SearchDependencies,
 	SearchFeature,
 	SearchParams,
-} from '../search-types';
-import { recipeRepository } from '../data/recipe-repository';
-import { searchService } from '../search-service';
+} from '../../types/search-types';
+import { recipeRepository } from '../../data/recipe-repository';
+import { searchService } from '../../services/search-service';
 import { useLocation, useSearchParams } from 'react-router';
 import { usePagination } from './use-result-pagination';
 

@@ -1,7 +1,7 @@
 import Header from '../components/layout/header';
 import Footer from '../components/layout/footer';
 import { useAnimationPrefs } from '../contexts/animation-context';
-import { useSearchFeature } from '../features/search/hooks/use-search';
+import { useSearchFeature } from '../hooks/search/use-search';
 import { Outlet } from 'react-router';
 import { useMemo } from 'react';
 

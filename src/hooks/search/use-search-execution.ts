@@ -4,7 +4,7 @@ import type {
 	SearchExecution,
 	SearchParams,
 	SearchResults,
-} from '../search-types';
+} from '../../types/search-types';
 
 export function useSearchExecution(
 	searchService: SearchService
@@ -16,7 +16,6 @@ export function useSearchExecution(
 	const executeSearch = async (
 		params: SearchParams
 	): Promise<SearchResults | null> => {
-		// Increment request ID to handle race conditions
 		const currentRequestId = ++requestIdRef.current;
 
 		setLoading(true);
@@ -26,15 +25,12 @@ export function useSearchExecution(
 		try {
 			const results = await searchService.search(params);
 
-			// Check if this is still the latest request
 			if (currentRequestId === requestIdRef.current) {
-				// Results will be handled by the composed hook
 				return results;
 			}
 
 			return null;
 		} catch (err) {
-			// Only set error if this is still the latest request
 			if (currentRequestId === requestIdRef.current) {
 				const errorMessage =
 					err instanceof Error ? err.message : 'Search failed';
@@ -43,7 +39,6 @@ export function useSearchExecution(
 
 			return null;
 		} finally {
-			// Only set loading false if this is still the latest request
 			if (currentRequestId === requestIdRef.current) {
 				setLoading(false);
 			}

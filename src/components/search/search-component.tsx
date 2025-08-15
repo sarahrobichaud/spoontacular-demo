@@ -2,7 +2,7 @@ import { motion } from 'framer-motion';
 import { useAnimationPrefs } from '../../contexts/animation-context';
 import { CuisineSelector } from './cuisine-selector';
 import { SearchInput } from './search-input';
-import type { GlobalSearchAPI } from '../../features/search/search-types';
+import type { GlobalSearchAPI } from '../../types/search-types';
 import { useNavigate } from 'react-router';
 
 interface SearchComponentProps {

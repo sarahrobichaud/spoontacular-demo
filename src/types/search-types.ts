@@ -1,4 +1,4 @@
-import type { PaginationInfo } from './hooks/use-result-pagination';
+import type { PaginationInfo } from '../hooks/search/use-result-pagination';
 
 // Core search state
 export interface SearchState {

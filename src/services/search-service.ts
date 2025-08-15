@@ -1,16 +1,14 @@
-import { mockDetailedRecipe, mockRecipes } from '../../data/mock-recipes';
-import { env } from '../../env';
+import { mockDetailedRecipe, mockRecipes } from '../data/mock-recipes';
+import { env } from '../env';
 import type {
 	DetailedRecipe,
 	Recipe,
 	RecipeSearchResponse,
-} from './search-types';
-import type {
 	SearchParams,
 	SearchResults,
 	SearchService,
 	SearchServiceDependencies,
-} from './search-types';
+} from '../types/search-types';
 
 /**
  * A Debug function to generate mock responses for the search service
@@ -74,7 +72,7 @@ export const searchService = (
 			let response: RecipeSearchResponse;
 
 			if (!env.useMockData) {
-				console.log("Hitting Complex Search Endpoint")
+				console.log('Hitting Complex Search Endpoint');
 				response = await recipeRepository.generalSearch({
 					query: query.trim(),
 					offset,
@@ -101,7 +99,7 @@ export const searchService = (
 		 */
 		async getRecipeDetails(id: number): Promise<DetailedRecipe> {
 			if (!env.useMockData) {
-				console.log("Hitting Details Endpoint")
+				console.log('Hitting Details Endpoint');
 				return recipeRepository.getDetails(id);
 			}
 			return mockDetailedRecipe;

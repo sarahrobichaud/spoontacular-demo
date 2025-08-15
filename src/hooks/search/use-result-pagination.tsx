@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useDebounce } from '../../../hooks/use-debounce';
+import { useDebounce } from '../use-debounce';
 
 export type PaginationInfo = {
 	// Metadata

@@ -4,15 +4,15 @@ import RecipeIdeasPrompt from '../components/search/recipe-idea-prompt';
 import { CustomLoader } from '../components/ui/custom-loader';
 import { RecipeCard } from '../components/recipes/recipe-card';
 import { useAnimationPrefs } from '../contexts/animation-context';
-import type { PaginationInfo } from '../features/search/hooks/use-result-pagination';
+import type { PaginationInfo } from '../hooks/search/use-result-pagination';
 
-import type { Recipe } from '../features/search/search-types';
+import type { Recipe } from '../types/search-types';
 import { Pagination } from '../components/search/pagination';
 import { CuisineSelector } from '../components/search/cuisine-selector';
 import { useIsMobile } from '../hooks/use-mobile';
 import { Filter, LoaderCircle, X } from 'lucide-react';
 import clsx from 'clsx';
-import type { GlobalSearchAPI } from '../features/search/search-types';
+import type { GlobalSearchAPI } from '../types/search-types';
 import { useOutletContext, useSearchParams } from 'react-router';
 
 export interface SearchPageProps {

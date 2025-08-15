@@ -10,7 +10,6 @@ import './styles/globals.css';
 import './styles/tailwind.css';
 import AuthLayout from './layouts/auth-layout';
 import { ProtectedRoute } from './layouts/protected-route';
-
 const AppContent = () => {
 	const renderDefaultLayout = () => {
 		return (

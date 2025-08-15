@@ -1,5 +1,5 @@
 import type { FormEvent, HTMLAttributes } from 'react';
-import type { GlobalSearchAPI } from '../../features/search/search-types';
+import type { GlobalSearchAPI } from '../../types/search-types';
 
 interface SearchInputProps extends HTMLAttributes<HTMLFormElement> {
 	search: GlobalSearchAPI;

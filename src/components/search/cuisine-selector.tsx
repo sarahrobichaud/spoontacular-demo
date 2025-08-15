@@ -1,7 +1,7 @@
 import type { HTMLAttributes } from 'react';
 import clsx from 'clsx';
 import { AVAILABLE_CUISINES } from '../../data/cuisines';
-import type { GlobalSearchAPI } from '../../features/search/search-types';
+import type { GlobalSearchAPI } from '../../types/search-types';
 
 interface CuisineSelectorProps extends HTMLAttributes<HTMLDivElement> {
 	search: GlobalSearchAPI;

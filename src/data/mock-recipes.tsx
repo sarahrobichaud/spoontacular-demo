@@ -1,6 +1,6 @@
 // Mock data for development
 
-import type { DetailedRecipe } from '../features/search/search-types';
+import type { DetailedRecipe } from '../types/search-types';
 
 export const mockDetailedRecipe: DetailedRecipe = {
 	id: 1,

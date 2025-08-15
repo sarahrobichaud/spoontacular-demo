@@ -5,7 +5,7 @@ import { useSafeAnimations } from '../../hooks/use-safe-animations';
 import { SearchInput } from '../search/search-input';
 import { Sparkles, TrashIcon } from 'lucide-react';
 import { useApiKey } from '../../contexts/api-key-context';
-import type { GlobalSearchAPI } from '../../features/search/search-types';
+import type { GlobalSearchAPI } from '../../types/search-types';
 import { useLocation, useNavigate } from 'react-router';
 
 interface HeaderProps {

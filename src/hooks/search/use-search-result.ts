@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import type { SearchResultsState } from '../search-types';
-import type { Recipe } from '../search-types';
+import type { SearchResultsState } from '../../types/search-types';
+import type { Recipe } from '../../types/search-types';
 
 export function useSearchResults(): SearchResultsState & {
 	setResults: (results: Recipe[]) => void;

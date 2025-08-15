@@ -9,4 +9,11 @@ export default defineConfig({
 		port: 5173,
 	},
 	plugins: [tailwindcss(), react()],
+	build: {
+		rollupOptions: {
+			output: {
+				manualChunks: undefined,
+			},
+		},
+	},
 });
